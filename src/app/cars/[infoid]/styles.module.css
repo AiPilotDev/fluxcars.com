@@ -1,0 +1,271 @@
+.description :global(table) {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.description :global(th) {
+  border: 1px solid #d1d5db;
+  background-color: #f3f4f6;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.description :global(td) {
+  border: 1px solid #d1d5db;
+  padding: 0.5rem;
+}
+
+.description :global(h1) {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.description :global(h2) {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+}
+
+.description :global(h3) {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+}
+
+.description :global(h4) {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+}
+
+.description :global(h5) {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+}
+
+.description :global(h6) {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+}
+
+.description :global(ul) {
+  list-style-type: disc;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.description :global(ul li) {
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+}
+
+.description :global(ul li:last-child) {
+  margin-bottom: 0;
+}
+
+/* Contact Block Styles - Calm Color Scheme */
+.contactSectionBelarus {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #0ea5e9;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.contactSectionBelarus:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+}
+
+.contactSectionUK {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+  border: 1px solid #eab308;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.contactSectionUK:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.15);
+}
+
+.contactSectionChina {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 1px solid #ef4444;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.contactSectionChina:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.contactSectionRussia {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #64748b;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.contactSectionRussia:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.15);
+}
+
+.contactSectionEmail {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  border: 1px solid #a855f7;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.contactSectionEmail:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
+}
+
+.contactHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.countryIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.flagEmoji {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.contactCountry {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-left: 2rem;
+}
+
+.contactPhone {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0.125rem 0;
+  border-radius: 0.25rem;
+}
+
+.contactPhone:hover {
+  color: #111827;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 0.125rem 0.25rem;
+  margin: -0.125rem -0.25rem;
+}
+
+.contactApps {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.contactEmail {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1f2937;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  display: inline-block;
+}
+
+.contactEmail:hover {
+  background: rgba(255, 255, 255, 0.8);
+  color: #a855f7;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .contactSectionBelarus,
+  .contactSectionUK,
+  .contactSectionChina,
+  .contactSectionRussia,
+  .contactSectionEmail {
+    padding: 0.625rem;
+  }
+  
+  .contactCountry {
+    font-size: 0.8125rem;
+  }
+  
+  .contactPhone {
+    font-size: 0.8125rem;
+  }
+  
+  .contactEmail {
+    font-size: 0.8125rem;
+    padding: 0.1875rem 0.375rem;
+  }
+  
+  .countryIcon {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+  
+  .flagEmoji {
+    font-size: 0.75rem;
+  }
+  
+  .contactInfo {
+    margin-left: 1.75rem;
+  }
+} 

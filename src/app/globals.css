@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Дополнительные стили для проекта */
+body {
+  font-family: var(--font-geist-sans);
+}
+
+/* Стили для плавной прокрутки */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Улучшение читаемости текста */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

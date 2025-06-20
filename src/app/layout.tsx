@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Каталог автомобилей",
-  description: "Лучший каталог автомобилей с актуальными ценами и характеристиками",
+  title: "Каталог автомобилей из Китая",
+  description: "Каталог автомобилей с актуальными ценами и характеристиками",
   keywords: "автомобили, каталог авто, купить машину, цены на авто",
-  authors: [{ name: "Your Company" }],
+  authors: [{ name: "Fluxcars" }],
   openGraph: {
-    title: "Каталог автомобилей",
+    title: "Каталог автомобилей из Китая",
     description: "Лучший каталог автомобилей с актуальными ценами",
     type: "website",
     locale: "ru_RU",

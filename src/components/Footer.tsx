@@ -36,7 +36,7 @@ export default function Footer() {
                 </Link>
               </div>
               <div>
-                <Link href="https://samochodyzchin.pl" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">
+                <Link href="https://cmotor.pl" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">
                   Samochody z Chin →
                 </Link>
               </div>
@@ -85,20 +85,13 @@ export default function Footer() {
             <h3 suppressHydrationWarning className="text-white text-lg font-semibold mb-4">Юридическая информация</h3>
             <div className="space-y-4">
               <div>
-                <h4 suppressHydrationWarning className="text-white font-medium mb-2">ООО «МарсМи»</h4>
+                <h4 suppressHydrationWarning className="text-white font-medium mb-2">Hefei Accord Import and Export Co., LTD</h4>
                 <p className="text-sm">
                   УНП: 193 414 593
                 </p>
-                <p className="text-sm">
-                  ОКПО: 504090135000
-                </p>
+                
               </div>
-              <div>
-                <h4 suppressHydrationWarning className="text-white font-medium mb-2">Юридический адрес:</h4>
-                <p className="text-sm">
-                  220070, Республика Беларусь, г. Минск, улица Солтыса, дом 187, оф. 203
-                </p>
-              </div>
+              
             </div>
           </div>
         </div>

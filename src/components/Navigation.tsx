@@ -25,7 +25,7 @@ export default function Navigation() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Car className="h-8 w-8 text-blue-500" />
-              <span className="text-xl font-bold text-white">ChinaMotor</span>
+              <span className="text-xl font-bold text-white">FluxCars</span>
             </Link>
             <div className="hidden md:flex ml-8 space-x-1">
               {menuItems.map((item) => (

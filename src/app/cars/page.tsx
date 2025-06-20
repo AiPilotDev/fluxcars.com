@@ -2,12 +2,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Car, ArrowUpDown, X, Search } from 'lucide-react';
 import { Car as CarType } from '@/types/directus';
 import { directusAPI, formatPrice } from '@/lib/directus';
-import CarCard from '@/components/CarCard';
 import CarListItem from '@/components/CarListItem';
 
 const ITEMS_PER_PAGE = 15;
@@ -42,15 +39,6 @@ interface FilterOptions {
   colors: string[];
   engineVolumes: number[];
 }
-
-// Утилитарная функция для безопасного парсинга числа
-const safeParseInt = (value: string): number | null => {
-  if (!value || value.trim() === '') {
-    return null;
-  }
-  const parsed = parseInt(value.trim(), 10);
-  return (isNaN(parsed) || parsed <= 0) ? null : parsed;
-};
 
 export default function CarsPage() {
   console.log('CarsPage render'); // Диагностика рендера
@@ -253,16 +241,6 @@ export default function CarsPage() {
       setCurrentPage(page);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
-
-  const getImageUrl = (thumbnail: string | null): string => {
-    if (!thumbnail) return '/images/car-placeholder.jpg';
-    
-    if (thumbnail.startsWith('http')) {
-      return thumbnail;
-    }
-    
-    return `${directusUrl}/assets/${thumbnail}`;
   };
 
   const renderPagination = () => {

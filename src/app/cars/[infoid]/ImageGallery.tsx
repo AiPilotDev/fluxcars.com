@@ -47,9 +47,10 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             }`}
             onClick={() => setCurrentIndex(idx)}
           >
-            <img
+            <Image
               src={`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${id}`}
               alt={`Thumbnail ${idx + 1}`}
+              fill
               className="h-full w-full object-cover"
             />
           </div>

@@ -3,7 +3,6 @@ import ImageGallery from './ImageGallery';
 import SimilarCars from './SimilarCars';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import styles from './styles.module.css';
 import { Car as DirectusCar } from '@/types/directus';
 import DescriptionWrapper from './DescriptionWrapper';
 import ContactsBlock from './ContactsBlock';

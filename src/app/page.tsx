@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { directusAPI } from '@/lib/directus';
 import { Car } from '@/types/directus';
@@ -40,20 +39,6 @@ const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
 if (!directusUrl) {
   throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
 }
-
-const getImageUrl = (thumbnail: string | null): string => {
-  if (!thumbnail) return '/images/car-placeholder.jpg';
-  
-  if (thumbnail.startsWith('http')) {
-    return thumbnail;
-  }
-  
-  if (thumbnail.startsWith('assets/')) {
-    return `${directusUrl}/${thumbnail}`;
-  }
-  
-  return `${directusUrl}/assets/${thumbnail}`;
-};
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -223,15 +208,6 @@ export default function Home() {
     } else {
       setFilters(prev => ({ ...prev, [field]: value }));
       setCurrentPage(1);
-    }
-  };
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(prev => prev === '+' ? '-' : '+');
-    } else {
-      setSortField(field);
-      setSortDirection('+');
     }
   };
 

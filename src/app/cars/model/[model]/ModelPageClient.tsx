@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { notFound, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import CarListItem from '@/components/CarListItem';
 import Pagination from '@/components/Pagination';
 import { Car } from '@/types/directus';
@@ -211,24 +211,6 @@ export default function ModelPageClient({
       setFilters(prev => ({ ...prev, [field]: value }));
       setCurrentPage(1);
     }
-  };
-
-  const handlePriceRangeChange = (value: [number, number]) => {
-    setFilters(prev => ({
-      ...prev,
-      priceRange: value,
-      price: value[1].toString()
-    }));
-    setCurrentPage(1);
-  };
-
-  const handleMileageRangeChange = (value: [number, number]) => {
-    setFilters(prev => ({
-      ...prev,
-      mileageRange: value,
-      mileage: value[1].toString()
-    }));
-    setCurrentPage(1);
   };
 
   const clearFilters = () => {

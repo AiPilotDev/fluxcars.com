@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+// import { notFound } from 'next/navigation';
 import CarListItem from '@/components/CarListItem';
 import Pagination from '@/components/Pagination';
 import { Car } from '@/types/directus';

@@ -24,7 +24,7 @@ export default function FeaturedCarsSlider({ cars }: FeaturedCarsSliderProps) {
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [nextSlide]);
 
   const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
   if (!directusUrl) {

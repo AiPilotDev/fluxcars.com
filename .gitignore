@@ -45,3 +45,14 @@ coverage/
 .vscode/
 .idea/
 .cursor/
+# ========================
+# конфиги
+# ========================
+env.local
+next.config
+next.config.js
+next.config.ts
+next.config.mjs
+postcss.config.mjs
+tailwind.config.js
+eslint.config.mjs

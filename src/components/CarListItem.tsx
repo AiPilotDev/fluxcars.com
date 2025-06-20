@@ -20,6 +20,11 @@ export default function CarListItem({ car }: CarListItemProps) {
     setIsClient(true);
   }, []);
 
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
+  if (!directusUrl) {
+    throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
+  }
+
   const getImageUrl = (thumbnail: string | null): string => {
     if (!thumbnail) return '/images/car-placeholder.jpg';
     
@@ -27,7 +32,7 @@ export default function CarListItem({ car }: CarListItemProps) {
       return thumbnail;
     }
     
-    return `${process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8055'}/assets/${thumbnail}`;
+    return `${directusUrl}/assets/${thumbnail}`;
   };
 
   return (
@@ -41,6 +46,7 @@ export default function CarListItem({ car }: CarListItemProps) {
           className="object-cover transition-transform duration-300 hover:scale-110"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           unoptimized={process.env.NODE_ENV === 'development'}
+          priority
         />
         <div className="absolute top-2 right-2">
           <button className="bg-white/90 hover:bg-white p-2 rounded-full shadow-sm transition-colors">

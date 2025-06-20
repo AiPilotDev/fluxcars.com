@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
+import Image from 'next/image';
 
 interface ImageGalleryProps {
   images: string[];
@@ -24,10 +25,13 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
         className="relative aspect-[16/9] w-full cursor-pointer overflow-hidden rounded-xl bg-gray-100"
         onClick={() => setLightboxOpen(true)}
       >
-        <img
+        <Image
           src={`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${images[currentIndex]}`}
           alt={`Car image ${currentIndex + 1}`}
+          fill
           className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+          priority
+          sizes="100vw"
         />
       </div>
 

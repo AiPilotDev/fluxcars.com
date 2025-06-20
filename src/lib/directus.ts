@@ -1,16 +1,18 @@
 // src/lib/directus.ts
 import axios, { AxiosRequestConfig } from 'axios';
-import qs from 'qs';
 import { Car, DirectusResponse } from '@/types/directus';
 
-const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8055';
+const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL;
+if (!DIRECTUS_URL) {
+  throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
+}
 const DIRECTUS_TOKEN = process.env.NEXT_PUBLIC_DIRECTUS_TOKEN;
 
 interface GetCarsParams {
   limit?: number;
   page?: number;
   sort?: string;
-  filter?: Record<string, any> | string;
+  filter?: Record<string, unknown> | string;
   meta?: string;
 }
 
@@ -96,3 +98,9 @@ export const formatDate = (dateString: string): string => {
     day: 'numeric',
   }).format(new Date(dateString));
 };
+
+export async function fetchCars(params: unknown): Promise<DirectusResponse<Car>> {
+  // Приводим параметры к типу GetCarsParams, если это объект
+  const safeParams = typeof params === 'object' && params !== null ? params as GetCarsParams : {};
+  return directusAPI.getCars(safeParams);
+}

@@ -11,7 +11,7 @@ export interface Car {
   date_updated?: string;
 }
 
-export interface DirectusResponse<T = any> {
+export interface DirectusResponse<T = unknown> {
   data: T[];
   meta: {
     total_count: number;

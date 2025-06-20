@@ -8,6 +8,11 @@ interface CarCardProps {
 }
 
 export default function CarCard({ car }: CarCardProps) {
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
+  if (!directusUrl) {
+    throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
+  }
+
   const getImageUrl = (thumbnail: string | null): string => {
     if (!thumbnail) return '/images/car-placeholder.jpg';
     
@@ -15,7 +20,7 @@ export default function CarCard({ car }: CarCardProps) {
       return thumbnail;
     }
     
-    return `${process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8055'}/assets/${thumbnail}`;
+    return `${directusUrl}/assets/${thumbnail}`;
   };
 
   return (

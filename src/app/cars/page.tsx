@@ -87,6 +87,11 @@ export default function CarsPage() {
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
+  if (!directusUrl) {
+    throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
+  }
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -257,7 +262,7 @@ export default function CarsPage() {
       return thumbnail;
     }
     
-    return `${process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8055'}/assets/${thumbnail}`;
+    return `${directusUrl}/assets/${thumbnail}`;
   };
 
   const renderPagination = () => {
@@ -267,7 +272,7 @@ export default function CarsPage() {
     const maxVisiblePages = 5;
     
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
     
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);

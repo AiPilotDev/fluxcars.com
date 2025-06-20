@@ -13,7 +13,7 @@ export default function Pagination({ totalPages, currentPage }: PaginationProps)
   const searchParams = useSearchParams();
 
   const createPageURL = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams?.toString() || '');
     params.set('page', pageNumber.toString());
     return `${pathname}?${params.toString()}`;
   };
@@ -22,7 +22,7 @@ export default function Pagination({ totalPages, currentPage }: PaginationProps)
     const pages = [];
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);

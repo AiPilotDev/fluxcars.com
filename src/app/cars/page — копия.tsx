@@ -22,7 +22,10 @@ interface DirectusResponse {
 }
 
 const ITEMS_PER_PAGE = 15;
-const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8055';
+const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL;
+if (!DIRECTUS_URL) {
+  throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
+}
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
@@ -87,7 +90,7 @@ export default function CarsPage() {
     const maxVisiblePages = 5;
     
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
     
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);

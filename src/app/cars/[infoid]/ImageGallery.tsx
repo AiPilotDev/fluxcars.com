@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import Image from 'next/image';
+import { getImageUrl } from '@/utils/getImageUrl';
 
 interface ImageGalleryProps {
   images: string[];
@@ -13,8 +14,9 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
   const slides = images.map(id => ({
-    src: `${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${id}`,
+    src: getImageUrl(id, directusUrl),
     alt: 'Car image'
   }));
 
@@ -26,12 +28,12 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
         onClick={() => setLightboxOpen(true)}
       >
         <Image
-          src={`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${images[currentIndex]}`}
+          src={getImageUrl(images[currentIndex], directusUrl)}
           alt={`Car image ${currentIndex + 1}`}
           fill
           className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
           priority
-          sizes="100vw"
+          sizes="(max-width: 1024px) 100vw, 66vw"
         />
       </div>
 
@@ -48,10 +50,11 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
             onClick={() => setCurrentIndex(idx)}
           >
             <Image
-              src={`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${id}`}
+              src={getImageUrl(id, directusUrl)}
               alt={`Thumbnail ${idx + 1}`}
               fill
               className="h-full w-full object-cover"
+              sizes="160px"
             />
           </div>
         ))}

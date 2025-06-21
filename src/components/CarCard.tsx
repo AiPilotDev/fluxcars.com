@@ -2,32 +2,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Car as CarType } from '@/types/directus';
 import { formatPrice } from '@/lib/directus';
+import { getImageUrl } from '@/utils/getImageUrl';
 
 interface CarCardProps {
   car: CarType;
 }
 
 export default function CarCard({ car }: CarCardProps) {
-  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
-  if (!directusUrl) {
-    throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
-  }
-
-  const getImageUrl = (thumbnail: string | null): string => {
-    if (!thumbnail) return '/images/car-placeholder.jpg';
-    
-    if (thumbnail.startsWith('http')) {
-      return thumbnail;
-    }
-    
-    return `${directusUrl}/assets/${thumbnail}`;
-  };
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+  const imageUrl = getImageUrl(car.thumbnail, directusUrl);
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative h-48">
         <Image
-          src={getImageUrl(car.thumbnail)}
+          src={imageUrl}
           alt={`${car.brand} ${car.model}`}
           fill
           className="object-cover"

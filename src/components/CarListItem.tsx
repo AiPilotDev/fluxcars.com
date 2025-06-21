@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Car } from '@/types/directus';
 import { useEffect, useState } from 'react';
+import { getImageUrl } from '@/utils/getImageUrl';
 
 interface CarListItemProps {
   car: Car;
@@ -20,27 +21,15 @@ export default function CarListItem({ car }: CarListItemProps) {
     setIsClient(true);
   }, []);
 
-  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
-  if (!directusUrl) {
-    throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
-  }
-
-  const getImageUrl = (thumbnail: string | null): string => {
-    if (!thumbnail) return '/images/car-placeholder.jpg';
-    
-    if (thumbnail.startsWith('http')) {
-      return thumbnail;
-    }
-    
-    return `${directusUrl}/assets/${thumbnail}`;
-  };
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+  const imageUrl = getImageUrl(car.thumbnail, directusUrl);
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={getImageUrl(car.thumbnail)}
+          src={imageUrl}
           alt={`${car.brand} ${car.model}`}
           fill
           className="object-cover transition-transform duration-300 hover:scale-110"

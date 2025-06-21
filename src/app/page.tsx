@@ -13,6 +13,8 @@ import {
 import CarListItem from '@/components/CarListItem';
 import InfoBlocks from '@/components/InfoBlocks';
 import FeaturedCarsSlider from '@/components/FeaturedCarsSlider';
+import { formatError } from '@/utils/formatError';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface Filters {
   brand: string;
@@ -151,8 +153,8 @@ export default function Home() {
         });
       }
     } catch (err) {
-      console.error('Error fetching cars:', err);
-      setError('Ошибка при загрузке данных');
+      console.error('Error fetching cars:', formatError(err));
+      setError(formatError(err));
     } finally {
       setLoading(false);
     }

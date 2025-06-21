@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Lightbox from 'yet-another-react-lightbox';
 import { useState, useEffect } from 'react';
+import { getImageUrl } from '@/utils/getImageUrl';
 
 interface Car {
   infoid: number;
@@ -39,8 +40,9 @@ export default function CarGallery({ car }: { car: Car }) {
     import('yet-another-react-lightbox/styles.css');
   }, []);
 
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
   const slides = car.images?.map(image => ({
-    src: image.url,
+    src: getImageUrl(image.url, directusUrl),
     alt: `${car.carname} - Image`
   })) || [];
 
@@ -54,7 +56,7 @@ export default function CarGallery({ car }: { car: Car }) {
               className="relative aspect-video cursor-pointer transform transition-transform hover:scale-105"
             >
               <Image
-                src={image.url}
+                src={getImageUrl(image.url, directusUrl)}
                 alt={`${car.carname} - Image ${idx + 1}`}
                 fill
                 className="object-cover rounded-lg shadow-lg"
@@ -77,7 +79,7 @@ export default function CarGallery({ car }: { car: Car }) {
             onClick={() => setIndex(idx)}
           >
             <Image
-              src={image.url}
+              src={getImageUrl(image.url, directusUrl)}
               alt={`${car.carname} - Image ${idx + 1}`}
               fill
               className="object-cover rounded-lg shadow-lg"

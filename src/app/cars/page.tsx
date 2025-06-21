@@ -4,8 +4,10 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Car, ArrowUpDown, X, Search } from 'lucide-react';
 import { Car as CarType } from '@/types/directus';
-import { directusAPI, formatPrice } from '@/lib/directus';
+import { directusAPI } from '@/lib/directus';
 import CarListItem from '@/components/CarListItem';
+import { formatError } from '@/utils/formatError';
+import { formatPrice } from '@/utils/formatPrice';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -166,8 +168,8 @@ export default function CarsPage() {
         setCars(response.data);
         setTotalCount(response.meta?.total_count || 0);
       } catch (err) {
-        console.error('Error fetching cars:', err);
-        setError('Ошибка при загрузке данных');
+        console.error('Error fetching cars:', formatError(err));
+        setError(formatError(err));
       } finally {
         setLoading(false);
       }

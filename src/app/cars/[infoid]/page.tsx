@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Car as DirectusCar } from '@/types/directus';
 import DescriptionWrapper from './DescriptionWrapper';
 import ContactsBlock from './ContactsBlock';
+import { formatError } from '@/utils/formatError';
 
 interface CarPageData {
   id: string;
@@ -47,12 +48,7 @@ async function getCar(infoid: number): Promise<CarPageData | null> {
     url.searchParams.append('filter[infoid][_eq]', infoid.toString());
     url.searchParams.append('fields', '*,images.*,images.directus_files_id.*');
     
-    const response = await fetch(url.toString(), {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
     
     if (!response.ok) {
       console.error('Failed to fetch car:', response.status, response.statusText);
@@ -68,7 +64,7 @@ async function getCar(infoid: number): Promise<CarPageData | null> {
 
     return data.data[0] as CarPageData;
   } catch (error) {
-    console.error('Error fetching car:', error);
+    console.error('Error fetching car:', formatError(error));
     return null;
   }
 }
@@ -83,12 +79,7 @@ async function getAllCars(): Promise<DirectusCar[]> {
     const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars`);
     url.searchParams.append('fields', '*,images.*,images.directus_files_id.*');
     
-    const response = await fetch(url.toString(), {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
     
     if (!response.ok) {
       console.error('Failed to fetch cars:', response.status, response.statusText);
@@ -98,7 +89,7 @@ async function getAllCars(): Promise<DirectusCar[]> {
     const data = await response.json();
     return data.data as DirectusCar[];
   } catch (error) {
-    console.error('Error fetching cars:', error);
+    console.error('Error fetching cars:', formatError(error));
     return [];
   }
 }

@@ -4,6 +4,7 @@ import Pagination from '@/components/Pagination';
 import { Car } from '@/types/directus';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { formatError } from '@/utils/formatError';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -37,12 +38,7 @@ async function getCarsByYear(year: string, page: number = 1) {
     url.searchParams.append('sort', '-date_created');
     url.searchParams.append('meta', 'filter_count');
     
-    const response = await fetch(url.toString(), {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
     
     if (!response.ok) {
       console.error('Failed to fetch cars:', response.status, response.statusText);
@@ -55,7 +51,7 @@ async function getCarsByYear(year: string, page: number = 1) {
       total: data.meta?.filter_count || 0
     };
   } catch (error) {
-    console.error('Error fetching cars:', error);
+    console.error('Error fetching cars:', formatError(error));
     return { cars: [], total: 0 };
   }
 }

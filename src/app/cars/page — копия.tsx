@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { formatError } from '@/utils/formatError';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface Car {
   id: string;
@@ -43,7 +45,8 @@ export default function CarsPage() {
       
       const offset = (page - 1) * ITEMS_PER_PAGE;
       const response = await fetch(
-        `${DIRECTUS_URL}/items/Cars?limit=${ITEMS_PER_PAGE}&offset=${offset}&sort=-date_created&meta=total_count,filter_count`
+        `${DIRECTUS_URL}/items/Cars?limit=${ITEMS_PER_PAGE}&offset=${offset}&sort=-date_created&meta=total_count,filter_count`,
+        { next: { revalidate: 60 } }
       );
 
       if (!response.ok) {
@@ -54,8 +57,8 @@ export default function CarsPage() {
       setCars(result.data);
       setTotalCount(result.meta.total_count);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Произошла ошибка при загрузке данных');
-      console.error('Error fetching cars:', err);
+      setError(formatError(err));
+      console.error('Error fetching cars:', formatError(err));
     } finally {
       setLoading(false);
     }
@@ -70,14 +73,6 @@ export default function CarsPage() {
       setCurrentPage(page);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ru-RU', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(price);
   };
 
   const getImageUrl = (thumbnail: string | null) => {

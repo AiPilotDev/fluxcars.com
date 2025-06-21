@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Car } from '@/types/directus';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { getImageUrl } from '@/utils/getImageUrl';
 
 interface FeaturedCarsSliderProps {
   cars: Car[];
@@ -26,20 +27,8 @@ export default function FeaturedCarsSlider({ cars }: FeaturedCarsSliderProps) {
     return () => clearInterval(timer);
   }, [nextSlide]);
 
-  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
-  if (!directusUrl) {
-    throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
-  }
-
-  const getImageUrl = (thumbnail: string | null): string => {
-    if (!thumbnail) return '/images/car-placeholder.jpg';
-    
-    if (thumbnail.startsWith('http')) {
-      return thumbnail;
-    }
-    
-    return `${directusUrl}/assets/${thumbnail}`;
-  };
+  const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+  const getImage = (thumbnail: string | null) => getImageUrl(thumbnail, directusUrl);
 
   return (
     <div className="relative bg-white rounded-b-xl shadow-lg overflow-hidden">
@@ -85,7 +74,7 @@ export default function FeaturedCarsSlider({ cars }: FeaturedCarsSliderProps) {
               {/* Right Image - 2/3 width */}
               <div className="w-2/3 relative">
                 <Image
-                  src={getImageUrl(car.thumbnail)}
+                  src={getImage(car.thumbnail)}
                   alt={`${car.brand} ${car.model}`}
                   fill
                   className="object-cover"

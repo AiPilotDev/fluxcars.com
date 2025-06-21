@@ -1,12 +1,14 @@
 // src/lib/directus.ts
 import axios, { AxiosRequestConfig } from 'axios';
 import { Car, DirectusResponse } from '@/types/directus';
+import { formatError } from '@/utils/formatError';
+import { formatPrice } from '@/utils/formatPrice';
 
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL;
 if (!DIRECTUS_URL) {
   throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
 }
-const DIRECTUS_TOKEN = process.env.NEXT_PUBLIC_DIRECTUS_TOKEN;
+const DIRECTUS_TOKEN = process.env.DIRECTUS_TOKEN;
 
 interface GetCarsParams {
   limit?: number;
@@ -37,8 +39,8 @@ class DirectusAPI {
       });
       return response.data;
     } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
+      console.error('API request failed:', formatError(error));
+      throw new Error(formatError(error));
     }
   }
 
@@ -82,15 +84,6 @@ class DirectusAPI {
 export const directusAPI = new DirectusAPI(DIRECTUS_URL, DIRECTUS_TOKEN);
 
 // Утилиты для форматирования
-export const formatPrice = (price: number, currency = 'USD'): string => {
-  return new Intl.NumberFormat('ru-RU', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
-};
-
 export const formatDate = (dateString: string): string => {
   return new Intl.DateTimeFormat('ru-RU', {
     year: 'numeric',

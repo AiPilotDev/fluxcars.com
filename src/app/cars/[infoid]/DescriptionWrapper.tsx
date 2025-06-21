@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import styles from './styles.module.css';
+import DOMPurify from 'dompurify';
 
 interface DescriptionWrapperProps {
   description: string;
@@ -12,12 +13,13 @@ export default function DescriptionWrapper({ description }: DescriptionWrapperPr
 
   useEffect(() => {
     setIsClient(true);
+    return () => setIsClient(false);
   }, []);
 
   if (!isClient) {
     return (
       <div className={`prose prose-sm max-w-none text-gray-600 ${styles.description}`}>
-        <div dangerouslySetInnerHTML={{ __html: description }} />
+        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }} />
       </div>
     );
   }
@@ -25,7 +27,7 @@ export default function DescriptionWrapper({ description }: DescriptionWrapperPr
   return (
     <div 
       className={`prose prose-sm max-w-none text-gray-600 ${styles.description}`}
-      dangerouslySetInnerHTML={{ __html: description }}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
     />
   );
 } 

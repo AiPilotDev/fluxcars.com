@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Car, DirectusResponse } from '@/types/directus';
+import { formatError } from '@/utils/formatError';
 
 interface BrandsResponse {
   brands: string[];
@@ -19,12 +20,7 @@ async function getAllBrands(): Promise<BrandsResponse> {
     url.searchParams.append('limit', '1000');
     url.searchParams.append('sort', 'brand');
     
-    const response = await fetch(url.toString(), {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
     
     if (!response.ok) {
       console.error('Failed to fetch brands:', response.status, response.statusText);
@@ -39,7 +35,7 @@ async function getAllBrands(): Promise<BrandsResponse> {
       total: uniqueBrands.length
     };
   } catch (error) {
-    console.error('Error fetching brands:', error);
+    console.error('Error fetching brands:', formatError(error));
     return { brands: [], total: 0 };
   }
 }

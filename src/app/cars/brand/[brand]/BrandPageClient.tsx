@@ -7,6 +7,7 @@ import Pagination from '@/components/Pagination';
 import { Car } from '@/types/directus';
 import Link from 'next/link';
 import { ArrowUpDown } from 'lucide-react';
+import { formatError } from '@/utils/formatError';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -183,8 +184,8 @@ export default function BrandPageClient({
         setCars(result.cars);
         setTotal(result.total);
       } catch (err) {
-        setError('Failed to load cars');
-        console.error(err);
+        setError(formatError(err));
+        console.error(formatError(err));
       } finally {
         setLoading(false);
       }

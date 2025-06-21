@@ -15,12 +15,7 @@ async function getBrandFromModel(model: string): Promise<string | null> {
     url.searchParams.append('fields', 'brand');
     url.searchParams.append('limit', '1');
     
-    const response = await fetch(url.toString(), {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
     
     if (!response.ok) {
       return null;

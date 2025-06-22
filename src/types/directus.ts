@@ -15,6 +15,7 @@ export interface Car {
   date_updated?: string;
   color?: string;
   engine_volume?: number;
+  condition?: string;
 }
 
 export interface DirectusResponse<T = unknown> {

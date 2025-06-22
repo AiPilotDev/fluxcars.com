@@ -8,6 +8,7 @@ import { directusAPI } from '@/lib/directus';
 import CarListItem from '@/components/CarListItem';
 import { formatError } from '@/utils/formatError';
 import { formatPrice } from '@/utils/formatPrice';
+import { useSearchParams } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -81,6 +82,31 @@ export default function CarsPage() {
   if (!directusUrl) {
     throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
   }
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Считываем параметры из URL и применяем к фильтрам
+    const brand = searchParams?.get('brand') || '';
+    const model = searchParams?.get('model') || '';
+    const year = searchParams?.get('year') || '';
+    const search = searchParams?.get('search') || '';
+    const color = searchParams?.get('color') || '';
+    const engineVolume = searchParams?.get('engineVolume') || '';
+    const price = searchParams?.get('price') || '';
+    const mileage = searchParams?.get('mileage') || '';
+    setFilters(prev => ({
+      ...prev,
+      brand,
+      model,
+      year,
+      search,
+      color,
+      engineVolume,
+      price,
+      mileage
+    }));
+  }, [searchParams]);
 
   useEffect(() => {
     const loadData = async () => {

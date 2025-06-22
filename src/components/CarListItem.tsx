@@ -27,7 +27,7 @@ export default function CarListItem({ car }: CarListItemProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       {/* Image Section */}
-      <div className="relative h-48 overflow-hidden">
+      <Link href={`/cars/${car.infoid}`} className="block relative h-48 overflow-hidden">
         <Image
           src={imageUrl}
           alt={`${car.brand} ${car.model}`}
@@ -44,7 +44,7 @@ export default function CarListItem({ car }: CarListItemProps) {
             </svg>
           </button>
         </div>
-      </div>
+      </Link>
 
       {/* Content Section */}
       <div className="p-4">

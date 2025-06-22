@@ -98,36 +98,23 @@ function InfoItem({ label, value }: { label: string; value: string | number | nu
   return (
     <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
       <span className="text-gray-600">{label}</span>
-      <span className="font-medium text-gray-900" suppressHydrationWarning>{value || '—'}</span>
+      <span className="font-medium text-gray-900">{value || '—'}</span>
     </div>
   );
 }
 
 function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] }) {
-  // Format numbers consistently for server and client
-  const formattedPrice = new Intl.NumberFormat('en-US').format(car.price);
-  const formattedDeliveryPrice = car.delivery_price > 0 ? new Intl.NumberFormat('en-US').format(car.delivery_price) : '';
-  const formattedMileage = car.mileage ? new Intl.NumberFormat('en-US').format(car.mileage) : '';
-
-  // Sanitize description content to prevent hydration issues
-  const sanitizeDescription = (description: string) => {
-    if (!description) return 'Нет описания';
-    
-    // Remove any data attributes that might cause hydration mismatches
-    return description
-      .replace(/data-heading-tag="[^"]*"/g, '')
-      .replace(/data-[^=]*="[^"]*"/g, '')
-      .trim();
-  };
-
-  const sanitizedDescription = sanitizeDescription(car.description);
+  // Format numbers as plain strings to avoid hydration issues
+  const formattedPrice = String(car.price);
+  const formattedDeliveryPrice = car.delivery_price > 0 ? String(car.delivery_price) : '';
+  const formattedMileage = car.mileage ? String(car.mileage) : '';
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-indigo-900 to-purple-900 text-white">
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4" suppressHydrationWarning>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
              {car.carname} - {car.fuel_type}
           </h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-200">
@@ -175,66 +162,21 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
               {/* Price Card */}
               <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-2xl font-bold mb-4" suppressHydrationWarning>Цена</h2>
+                  <h2 className="text-2xl font-bold mb-4">Цена</h2>
                   <div className="space-y-2">
-                    <p className="text-4xl font-bold" suppressHydrationWarning>${formattedPrice}</p>
+                    <p className="text-4xl font-bold">{formattedPrice}</p>
                     {car.delivery_price > 0 && (
-                      <p className="text-indigo-100" suppressHydrationWarning>Доставка: ${formattedDeliveryPrice}</p>
+                      <p className="text-indigo-100">Доставка: {formattedDeliveryPrice}</p>
                     )}
                   </div>
                 </div>
               </div>
-
-              {/* Contact Card */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="p-6">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Связаться с нами</h2>
-                  <div className="space-y-4">
-                    <a
-                      href={`https://t.me/your_telegram`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-3 w-full bg-[#0088cc] text-white px-4 py-3 rounded-lg hover:bg-[#0077b3] transition-colors"
-                    >
-                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.2-.04-.28-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.05-.78 4.12-1.79 6.87-2.97 8.26-3.54 3.93-1.61 4.75-1.89 5.24-1.9.11 0 .37.03.54.17.14.12.18.28.2.45-.02.14-.02.3-.04.42z"/>
-                      </svg>
-                      <span className="text-lg font-medium">Telegram</span>
-                    </a>
-                    <a
-                      href={`viber://chat?number=your_number`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-3 w-full bg-[#7360f2] text-white px-4 py-3 rounded-lg hover:bg-[#5d4cd9] transition-colors"
-                    >
-                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 15.5c-.28 0-.5-.22-.5-.5v-2.5c0-.28.22-.5.5-.5s.5.22.5.5v2.5c0 .28-.22.5-.5.5zm3-3c-.28 0-.5-.22-.5-.5v-2.5c0-.28.22-.5.5-.5s.5.22.5.5v2.5c0 .28-.22.5-.5.5zm-6 0c-.28 0-.5-.22-.5-.5v-2.5c0-.28.22-.5.5-.5s.5.22.5.5v2.5c0 .28-.22.5-.5.5zm3-3c-.28 0-.5-.22-.5-.5v-2.5c0-.28.22-.5.5-.5s.5.22.5.5v2.5c0 .28-.22.5-.5.5z"/>
-                      </svg>
-                      <span className="text-lg font-medium">Viber</span>
-                    </a>
-                    <a
-                      href={`https://wa.me/your_number`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-3 w-full bg-[#25D366] text-white px-4 py-3 rounded-lg hover:bg-[#1da851] transition-colors"
-                    >
-                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.14 15.86c-1.73 0-3.43-.5-4.92-1.44l-3.55.91.97-3.46c-1.03-1.61-1.58-3.47-1.58-5.41 0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.41-6.05c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.07-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.46-.01-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.39 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.25 1.05.4 1.41.51.59.19 1.13.16 1.56.1.47-.07 1.46-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.07-.1-.23-.16-.48-.28z"/>
-                      </svg>
-                      <span className="text-lg font-medium">WhatsApp</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contacts Block - Mobile */}
-              <ContactsBlock />
             </div>
 
             {/* Additional Info Card */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Дополнительная информация</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Дополнительная информация</h2>
                 <div className="space-y-4">
                   <InfoItem label="Пробег" value={formattedMileage ? `${formattedMileage} км` : null} />
                   <InfoItem label="Год выпуска" value={car.year?.toString()} />
@@ -247,7 +189,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
             {/* Technical Specifications */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Технические характеристики</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Технические характеристики</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <InfoItem label="Объем двигателя" value={car.engine_volume ? `${car.engine_volume} л` : null} />
@@ -267,38 +209,11 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
               </div>
             </div>
 
-            {/* Description */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Описание</h2>
-                <DescriptionWrapper description={sanitizedDescription} />
-              </div>
-            </div>
-
-            {/* Similar Cars */}
-            <SimilarCars currentCar={car} cars={allCars} />
-          </div>
-
-          {/* Right Column - Price and Contact - Desktop Only */}
-          <div className="hidden lg:block">
-            <div className="sticky top-8 space-y-8 transition-all duration-300">
-              {/* Price Card */}
-              <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg overflow-hidden">
-                <div className="p-6">
-                  <h2 className="text-2xl font-bold mb-4" suppressHydrationWarning>Цена</h2>
-                  <div className="space-y-2">
-                    <p className="text-4xl font-bold" suppressHydrationWarning>${formattedPrice}</p>
-                    {car.delivery_price > 0 && (
-                      <p className="text-indigo-100" suppressHydrationWarning>Доставка: ${formattedDeliveryPrice}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact Card */}
+            {/* Contact and ContactsBlock for mobile only */}
+            <div className="lg:hidden space-y-8">
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Связаться с нами</h2>
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">Связаться с нами</h2>
                   <div className="space-y-4">
                     <a
                       href={`https://t.me/your_telegram`}
@@ -336,8 +251,78 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
                   </div>
                 </div>
               </div>
+              <ContactsBlock />
+            </div>
 
-              {/* Contacts Block */}
+            {/* Description */}
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="p-6">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Описание</h2>
+                <DescriptionWrapper description={car.description} />
+              </div>
+            </div>
+
+            {/* Similar Cars */}
+            <SimilarCars currentCar={car} cars={allCars} />
+          </div>
+
+          {/* Right Column - Price and Contact - Desktop Only */}
+          <div className="hidden lg:block">
+            <div className="sticky top-8 space-y-8 transition-all duration-300">
+              {/* Price Card */}
+              <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg overflow-hidden">
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold mb-4">Цена</h2>
+                  <div className="space-y-2">
+                    <p className="text-4xl font-bold">{formattedPrice} $</p>
+                    {car.delivery_price > 0 && (
+                      <p className="text-indigo-100">Стоимость с доставкой: {formattedDeliveryPrice} $</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Card (Moved) */}
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div className="p-6">
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">Связаться с нами</h2>
+                  <div className="space-y-4">
+                    <a
+                      href={`https://t.me/your_telegram`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full bg-[#0088cc] text-white px-4 py-3 rounded-lg hover:bg-[#0077b3] transition-colors"
+                    >
+                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.2-.04-.28-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.25.38-.51 1.05-.78 4.12-1.79 6.87-2.97 8.26-3.54 3.93-1.61 4.75-1.89 5.24-1.9.11 0 .37.03.54.17.14.12.18.28.2.45-.02.14-.02.3-.04.42z"/>
+                      </svg>
+                      <span className="text-lg font-medium">Telegram</span>
+                    </a>
+                    <a
+                      href={`viber://chat?number=your_number`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full bg-[#7360f2] text-white px-4 py-3 rounded-lg hover:bg-[#5d4cd9] transition-colors"
+                    >
+                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 15.5c-.28 0-.5-.22-.5-.5v-2.5c0-.28.22-.5.5-.5s.5.22.5.5v2.5c0 .28-.22.5-.5.5zm3-3c-.28 0-.5-.22-.5-.5v-2.5c0-.28.22-.5.5-.5s.5.22.5.5v2.5c0 .28-.22.5-.5.5zm-6 0c-.28 0-.5-.22-.5-.5v-2.5c0-.28.22-.5.5-.5s.5.22.5.5v2.5c0 .28-.22.5-.5.5zm3-3c-.28 0-.5-.22-.5-.5v-2.5c0-.28.22-.5.5-.5s.5.22.5.5v2.5c0 .28-.22.5-.5.5z"/>
+                      </svg>
+                      <span className="text-lg font-medium">Viber</span>
+                    </a>
+                    <a
+                      href={`https://wa.me/your_number`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full bg-[#25D366] text-white px-4 py-3 rounded-lg hover:bg-[#1da851] transition-colors"
+                    >
+                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.14 15.86c-1.73 0-3.43-.5-4.92-1.44l-3.55.91.97-3.46c-1.03-1.61-1.58-3.47-1.58-5.41 0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.41-6.05c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.07-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.43-.14 0-.3-.01-.46-.01-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.39 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.25 1.05.4 1.41.51.59.19 1.13.16 1.56.1.47-.07 1.46-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.07-.1-.23-.16-.48-.28z"/>
+                      </svg>
+                      <span className="text-lg font-medium">WhatsApp</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
               <ContactsBlock />
             </div>
           </div>

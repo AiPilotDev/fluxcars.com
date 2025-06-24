@@ -289,7 +289,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
                   <h2 className="text-2xl font-semibold text-gray-800 mb-4">Связаться с нами</h2>
                   <div className="space-y-4">
                     <a
-                      href={`https://t.me/your_telegram`}
+                      href={`https://t.me/chinamotor_bot`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-3 w-full bg-[#0088cc] text-white px-4 py-3 rounded-lg hover:bg-[#0077b3] transition-colors"
@@ -300,7 +300,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
                       <span className="text-lg font-medium">Telegram</span>
                     </a>
                     <a
-                      href={`viber://chat?number=your_number`}
+                      href={`https://connect.viber.com/ru/business/467d53c8-1703-11f0-b10f-36482bc6d4ae`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-3 w-full bg-[#7360f2] text-white px-4 py-3 rounded-lg hover:bg-[#5d4cd9] transition-colors"
@@ -311,7 +311,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
                       <span className="text-lg font-medium">Viber</span>
                     </a>
                     <a
-                      href={`https://wa.me/your_number`}
+                      href={`https://wa.me/447822032515`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-3 w-full bg-[#25D366] text-white px-4 py-3 rounded-lg hover:bg-[#1da851] transition-colors"

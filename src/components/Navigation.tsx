@@ -13,8 +13,9 @@ export default function Navigation() {
     { href: '/', label: 'Главная' },
     { href: '/cars', label: 'Поиск авто' },
     { href: '/about', label: 'О проекте' },
-    { href: '/partners', label: 'Партнеры' },
-    { href: '/contacts', label: 'Контакты' },
+    // { href: '/partners', label: 'Партнеры' },
+    // { href: '/contacts', label: 'Контакты' },
+    // { href: '/terms', label: 'Условия использования' },
   ];
 
   return (

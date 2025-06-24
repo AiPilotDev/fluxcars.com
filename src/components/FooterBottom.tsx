@@ -7,11 +7,8 @@ export default function FooterBottom() {
       <div className="flex flex-col md:flex-row justify-between items-center">
         <Copyright />
         <div className="mt-4 md:mt-0 flex space-x-6">
-          <Link href="/privacy" className="text-sm text-gray-400 hover:text-gray-300 transition-colors">
+          <Link href="/policy" className="text-sm text-gray-400 hover:text-gray-300 transition-colors">
             Политика конфиденциальности
-          </Link>
-          <Link href="/terms" className="text-sm text-gray-400 hover:text-gray-300 transition-colors">
-            Условия использования
           </Link>
         </div>
       </div>

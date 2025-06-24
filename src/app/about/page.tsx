@@ -1,86 +1,107 @@
 'use client';
-import { CheckCircle, ShieldCheck, Users, Zap, Car, Search, Truck, FileText } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { CheckCircle, ShieldCheck, Users, Zap, Car, Search, Truck, FileText, Globe, DollarSign, FileCheck2, ClipboardCheck, Banknote } from 'lucide-react';
 
-const stepsData = [
+const problemsData = [
   {
-    icon: <Search className="h-8 w-8 text-blue-500" />,
-    title: 'AI-подбор проверенных автомобилей',
-    desc: 'Ежедневно анализируем сотни объявлений с помощью искусственного интеллекта, чтобы исключить автомобили со скрученным пробегом, аварийные и сомнительные варианты. Вы получаете только проверенные предложения с реальными ценами.'
+    icon: <Globe className="h-7 w-7 text-blue-500" />, 
+    text: 'Экономия времени и нервов – никаких скрытых проблем после покупки.',
   },
   {
-    icon: <Users className="h-8 w-8 text-green-500" />,
-    title: 'Бесплатный подбор под ваши требования',
-    desc: 'Наши менеджеры подберут автомобиль с учетом вашего бюджета, технических предпочтений и дизайна. Мы учитываем все пожелания, чтобы найти идеальный вариант.'
+    icon: <DollarSign className="h-7 w-7 text-green-500" />, 
+    text: 'Даём доступ к реальным ценам, без накруток',
   },
   {
-    icon: <FileText className="h-8 w-8 text-yellow-500" />,
-    title: 'Полная проверка истории автомобиля',
-    desc: 'Перед покупкой мы проверяем юридическую чистоту автомобиля (отсутствие арестов, кредитов и угонов), подтверждаем реальный пробег, анализируем историю обслуживания и выявляем все факты ДТП, ремонтов и скрытых дефектов.'
+    icon: <ShieldCheck className="h-7 w-7 text-yellow-500" />, 
+    text: 'Проверяем автомобили на всех этапах',
   },
   {
-    icon: <ShieldCheck className="h-8 w-8 text-indigo-500" />,
-    title: 'Профессиональный осмотр в Китае',
-    desc: 'При оплате через наших партнеров вы получаете бесплатную экспертную диагностику. Мы проверяем состояние кузова, двигателя, электроники и всех технических узлов, а также сверяем документы с фактическим состоянием автомобиля.'
-  },
-  {
-    icon: <Truck className="h-8 w-8 text-red-500" />,
-    title: 'Быстрая и надежная доставка',
-    desc: 'Мы сотрудничаем с проверенными логистическими компаниями, чтобы обеспечить оперативную и безопасную доставку автомобиля. Наши партнеры помогают с таможенным оформлением и другими формальностями.'
-  },
-  {
-    icon: <Zap className="h-8 w-8 text-pink-500" />,
-    title: 'Прозрачные условия без скрытых платежей',
-    desc: 'Мы не предлагаем нереалистично низких цен с подвохом — только честные сделки с гарантией надежности. Наша задача — сделать процесс покупки максимально комфортным и безопасным для вас.'
+    icon: <FileCheck2 className="h-7 w-7 text-indigo-500" />, 
+    text: 'Обеспечиваем безопасность сделки и прозрачную оплату',
   },
 ];
 
-const advantagesData = [
+const howWeDoData = [
   {
-    icon: <CheckCircle className="h-6 w-6 text-blue-500" />,
-    text: 'Искусственный интеллект для точного отбора автомобилей.'
+    icon: <Banknote className="h-8 w-8 text-blue-500" />,
+    title: 'Оплата через Alibaba Pay Escrow',
+    desc: 'Ваш платёж проходит через защищённую систему Escrow. Деньги хранятся на счёте Chouzhou Commercial Bank и поступают продавцу только после отправки автомобиля.'
   },
   {
-    icon: <Car className="h-6 w-6 text-green-500" />,
-    text: 'Прямые контакты с проверенными поставщиками в Китае.'
+    icon: <Users className="h-8 w-8 text-green-500" />,
+    title: 'Работаем только с проверенными поставщиками',
+    desc: 'Все наши партнёры — с историей, рейтингами и официальными каналами на Alibaba. Это исключает "серые" схемы и снижает риски.'
   },
   {
-    icon: <ShieldCheck className="h-6 w-6 text-yellow-500" />,
-    text: 'Полная проверка перед покупкой.'
+    icon: <FileText className="h-8 w-8 text-yellow-500" />,
+    title: 'Проверяем автомобили до отправки',
+    desc: 'VIN, пробег, сервисные записи, участие в ДТП, ограничения и залоги — всё проверяется по заводским и правовым базам.'
   },
   {
-    icon: <Users className="h-6 w-6 text-indigo-500" />,
-    text: 'Профессиональное сопровождение на всех этапах.'
+    icon: <ClipboardCheck className="h-8 w-8 text-indigo-500" />,
+    title: 'Технический осмотр в Шанхае',
+    desc: 'Мотор, коробка, подвеска, электрика, кузов — проходит диагностику на складе.'
+  },
+  {
+    icon: <ShieldCheck className="h-8 w-8 text-red-500" />,
+    title: 'Экспортный аудит',
+    desc: 'Каждый автомобиль проходит обязательную государственную сертификацию перед вывозом. Без этой проверки экспорт невозможен. Вы получаете официальный протокол соответствия.'
+  },
+];
+
+const whyConvenientData = [
+  {
+    icon: <DollarSign className="h-6 w-6 text-blue-500" />,
+    text: 'Прозрачные цены — как на китайских автомобильных платформах, без наценок',
+  },
+  {
+    icon: <FileCheck2 className="h-6 w-6 text-green-500" />,
+    text: 'Документы в порядке — авто готово к легальному ввозу и регистрации',
+  },
+  {
+    icon: <Search className="h-6 w-6 text-yellow-500" />,
+    text: 'Всё под контролем — вы знаете, что покупаете, и в каком состоянии',
+  },
+  {
+    icon: <Zap className="h-6 w-6 text-indigo-500" />,
+    text: 'Без лишних затрат времени и нервов — мы всё проверяем до отгрузки',
   },
 ];
 
 export default function AboutPage() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
-  const steps = mounted
-    ? stepsData
-    : stepsData.map(({ icon, ...rest }) => ({ icon: null, ...rest }));
-  const advantages = mounted
-    ? advantagesData
-    : advantagesData.map(({ icon, ...rest }) => ({ icon: null, ...rest }));
+  const problems = problemsData;
+  const howWeDo = howWeDoData;
+  const whyConvenient = whyConvenientData;
 
   return (
     <main className="bg-gray-50 min-h-screen">
-      <section className="bg-gradient-to-r from-blue-600 to-blue-400 py-16 text-white text-center">
+      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-slate-800 py-16 text-white text-center">
         <div className="max-w-3xl mx-auto px-4">
-          <h1 className="text-4xl sm:text-5xl font-extrabold mb-4">О проекте</h1>
+          <h1 className="text-4xl sm:text-5xl font-extrabold mb-4">О FluxCars</h1>
           <p className="text-lg sm:text-2xl font-medium mb-6">
-            Наша цель — помочь вам приобрести качественный автомобиль из Китая (новый или с небольшим пробегом) без переплат, рисков и скрытых проблем. Мы берем на себя все этапы сделки, экономя ваше время и бюджет.
+            FluxCars — это платформа для покупки автомобилей из Китая с доставкой в любую страну. Мы делаем процесс понятным, безопасным и управляемым: от выбора авто — до оформления и экспорта.
           </p>
+        </div>
+      </section>
+
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Что решает FluxCars</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {problems.map((item, idx) => (
+              <div key={idx} className="flex items-center bg-blue-50 rounded-xl p-5 shadow-sm">
+                <div className="mr-4">{item.icon}</div>
+                <span className="text-gray-800 text-lg">{item.text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="py-16">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">Как мы работаем</h2>
+          <h2 className="text-3xl font-bold text-blue-600 mb-10 text-center">Как мы это делаем</h2>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {steps.map((step, idx) => (
+            {howWeDo.map((step, idx) => (
               <div key={idx} className="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-2xl">
                 <div className="mb-4">{step.icon}</div>
                 <h3 className="text-xl font-semibold mb-2 text-gray-900">{step.title}</h3>
@@ -93,14 +114,22 @@ export default function AboutPage() {
 
       <section className="bg-white py-16">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-blue-600 mb-8 text-center">Почему выбирают нас</h2>
+          <h2 className="text-3xl font-bold text-blue-600 mb-8 text-center">Почему это удобно</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {advantages.map((adv, idx) => (
+            {whyConvenient.map((adv, idx) => (
               <div key={idx} className="flex items-center bg-blue-50 rounded-xl p-5 shadow-sm">
                 <div className="mr-4">{adv.icon}</div>
                 <span className="text-gray-800 text-lg">{adv.text}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="bg-gradient-to-r from-blue-100 to-blue-50 rounded-2xl shadow-lg p-8 text-center">
+            <h2 className="text-2xl font-bold text-blue-700 mb-4">FluxCars — покупка авто из Китая, как из салона рядом с домом.</h2>
           </div>
         </div>
       </section>
@@ -119,4 +148,4 @@ export default function AboutPage() {
       </section>
     </main>
   );
-} 
+}

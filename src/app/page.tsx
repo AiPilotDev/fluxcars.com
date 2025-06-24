@@ -149,36 +149,44 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section на всю ширину экрана */}
-      <section className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-slate-800 text-white overflow-hidden shadow-2xl border-b-4 border-slate-700 px-0 py-0" style={{position: 'relative', left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw'}}>
+      <section className="relative max-w-full mx-auto flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-slate-800 text-white overflow-hidden shadow-2xl border-b-4 border-slate-700 px-0 py-0">
         <div className="absolute inset-0 bg-[url('/globe.svg')] bg-cover bg-center opacity-5 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-slate-800/80 pointer-events-none" />
-        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 py-8 gap-8 text-center lg:text-left">
+        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 py-8 gap-6 text-center lg:text-left">
           {/* Блок с заголовком и описанием */}
-          <div className="flex flex-col items-center lg:items-start justify-center">
-            <h1 className="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg tracking-widest text-slate-100 leading-tight" style={{letterSpacing: '0.04em'}}>Авто из Китая</h1>
-            <p className="text-2xl md:text-3xl font-semibold text-cyan-300 mb-4 drop-shadow">Платформа для поиска автомобилей от продавцов из Китая</p>
-            <p className="text-lg md:text-xl mb-0 md:mb-4 text-slate-300">100% безопасность сделки. Финансовые гарантии нашей платформы и платёжной системы <span className='font-bold text-lime-400'>Alibaba</span> защищают ваши платежи</p>
+          <div className="flex flex-col items-center lg:items-start justify-center w-full max-w-lg bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-lg p-5 md:p-8 backdrop-blur-md">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-3 md:mb-4 text-gray-900 dark:text-slate-100 leading-tight" style={{letterSpacing: '0.04em'}}>Авто из Китая</h1>
+            <p className="text-lg md:text-2xl font-semibold text-cyan-700 dark:text-cyan-300 mb-3 md:mb-4">Платформа для поиска автомобилей от продавцов из Китая</p>
+            <p className="text-base md:text-lg mb-0 md:mb-4 text-gray-700 dark:text-slate-300">100% безопасность сделки. Финансовые гарантии нашей платформы и платёжной системы <span className='font-bold text-lime-600 dark:text-lime-400'>Alibaba</span> защищают ваши платежи</p>
           </div>
-          {/* Форма поиска справа на десктопе, снизу на мобиле */}
-          <div className="flex items-center justify-center">
-            <div className="w-full max-w-md lg:max-w-sm">
+          {/* Форма поиска */}
+          <div className="flex items-center justify-center w-full max-w-lg">
+            <div className="w-full">
               <HeroSearchForm />
             </div>
           </div>
         </div>
       </section>
       {/* Остальной контент ограничен контейнером */}
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mt-10">
         <div>
           {/* --- Услуги: Антигравийная пленка и Антикоррозийное покрытие --- */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="flex items-center bg-white rounded-2xl shadow-lg p-8 text-xl font-semibold gap-6 border-l-4 border-cyan-400">
-              <span className="text-4xl">🧊</span>
-              <span className="text-gray-900 font-semibold" style={{fontFamily: 'Montserrat, Arial, sans-serif'}}>Полная оклейка авто антигравийной пленкой в Китае — <span className="text-cyan-700 font-bold">999$</span></span>
+            <div className="flex items-center bg-white rounded-2xl shadow-xl p-6 md:p-8 gap-6">
+              <span className="text-5xl md:text-6xl select-none">🧊</span>
+              <div className="flex flex-col">
+                <span className="text-gray-900 font-semibold text-lg md:text-xl mb-1" style={{fontFamily: 'Montserrat, Arial, sans-serif'}}>Полная оклейка авто антигравийной пленкой</span>
+                <span className="text-gray-500 text-sm mb-2">в Китае</span>
+                <span className="text-cyan-700 font-extrabold text-2xl md:text-3xl tracking-tight">999$</span>
+              </div>
             </div>
-            <div className="flex items-center bg-white rounded-2xl shadow-lg p-8 text-xl font-semibold gap-6 border-l-4 border-lime-400">
-              <span className="text-4xl">🛡️</span>
-              <span className="text-gray-900 font-semibold" style={{fontFamily: 'Montserrat, Arial, sans-serif'}}>Полное антикорозийное покрытие автомобиля — <span className="text-lime-700 font-bold">399$</span></span>
+            <div className="flex items-center bg-white rounded-2xl shadow-xl p-6 md:p-8 gap-6">
+              <span className="text-5xl md:text-6xl select-none">🛡️</span>
+              <div className="flex flex-col">
+                <span className="text-gray-900 font-semibold text-lg md:text-xl mb-1" style={{fontFamily: 'Montserrat, Arial, sans-serif'}}>Полное антикорозийное покрытие автомобиля</span>
+                <span className="text-gray-500 text-sm mb-2">в Китае</span>
+                <span className="text-lime-700 font-extrabold text-2xl md:text-3xl tracking-tight">399$</span>
+              </div>
             </div>
           </div>
           <style jsx global>{`
@@ -363,7 +371,7 @@ function HeroSearchForm() {
           {models.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
       </div>
-      <button type="submit" className="mt-2 w-full bg-gradient-to-r from-cyan-700 to-lime-500 text-gray-900 font-bold py-3 rounded-lg shadow-lg hover:from-cyan-500 hover:to-lime-400 transition ring-2 ring-cyan-400 ring-offset-2">Найти авто</button>
+      <button type="submit" className="mt-2 w-full bg-gradient-to-r from-cyan-700 to-blue-600 text-white font-bold py-3 rounded-lg shadow-lg hover:from-cyan-500 hover:to-blue-400 transition ring-2 ring-cyan-400 ring-offset-2">Найти авто</button>
     </form>
   );
 }

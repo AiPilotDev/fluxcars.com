@@ -7,6 +7,7 @@ import { Car as DirectusCar } from '@/types/directus';
 import DescriptionWrapper from './DescriptionWrapper';
 import ContactsBlock from './ContactsBlock';
 import { formatError } from '@/utils/formatError';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface CarPageData {
   id: string;
@@ -105,19 +106,19 @@ function InfoItem({ label, value }: { label: string; value: string | number | nu
 
 function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] }) {
   // Format numbers as plain strings to avoid hydration issues
-  const formattedPrice = String(car.price);
-  const formattedDeliveryPrice = car.delivery_price > 0 ? String(car.delivery_price) : '';
+  const formattedPrice = formatPrice(car.price, 'USD');
+  const formattedDeliveryPrice = car.delivery_price > 0 ? formatPrice(car.delivery_price, 'USD') : '';
   const formattedMileage = car.mileage ? String(car.mileage) : '';
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-indigo-900 to-purple-900 text-white">
-        <div className="container mx-auto px-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+      <div className="relative bg-gradient-to-r from-indigo-900 to-purple-900 text-white w-full">
+        <div className="container mx-auto px-4 py-6 sm:py-12 max-w-full sm:max-w-7xl">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4">
              {car.carname} - {car.fuel_type}
           </h1>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-200">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-200 text-sm sm:text-base">
             <Link 
               href={`/cars/brand/${encodeURIComponent(car.brand)}`}
               className="hover:text-white transition-colors"
@@ -274,9 +275,9 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
                 <div className="p-6">
                   <h2 className="text-2xl font-bold mb-4">Цена</h2>
                   <div className="space-y-2">
-                    <p className="text-4xl font-bold">{formattedPrice} $</p>
+                    <p className="text-4xl font-bold">{formattedPrice}</p>
                     {car.delivery_price > 0 && (
-                      <p className="text-indigo-100">Стоимость с доставкой: {formattedDeliveryPrice} $</p>
+                      <p className="text-indigo-100">Стоимость с доставкой:  {formattedDeliveryPrice}</p>
                     )}
                   </div>
                 </div>

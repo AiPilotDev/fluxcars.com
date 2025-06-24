@@ -148,25 +148,27 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4">
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-slate-800 text-white py-28 mb-16 overflow-hidden shadow-2xl border-b-4 border-slate-700 min-h-[520px] flex items-center">
-          <div className="absolute inset-0 bg-[url('/globe.svg')] bg-cover bg-center opacity-5" />
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-slate-800/80" />
-          <div className="container mx-auto px-4 relative z-10 flex flex-col-reverse lg:flex-row-reverse items-center justify-center gap-10 lg:gap-20 text-center lg:text-left">
-            {/* Форма поиска справа на десктопе, снизу на мобиле */}
-            <div className="w-full max-w-md lg:max-w-sm flex-shrink-0 mb-8 lg:mb-0">
+      {/* Hero Section на всю ширину экрана */}
+      <section className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-slate-800 text-white overflow-hidden shadow-2xl border-b-4 border-slate-700 px-0 py-0" style={{position: 'relative', left: '50%', right: '50%', marginLeft: '-50vw', marginRight: '-50vw'}}>
+        <div className="absolute inset-0 bg-[url('/globe.svg')] bg-cover bg-center opacity-5 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-slate-800/80 pointer-events-none" />
+        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 py-8 gap-8 text-center lg:text-left">
+          {/* Блок с заголовком и описанием */}
+          <div className="flex flex-col items-center lg:items-start justify-center">
+            <h1 className="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg tracking-widest text-slate-100 leading-tight" style={{letterSpacing: '0.04em'}}>Авто из Китая</h1>
+            <p className="text-2xl md:text-3xl font-semibold text-cyan-300 mb-4 drop-shadow">Платформа для поиска автомобилей от продавцов из Китая</p>
+            <p className="text-lg md:text-xl mb-0 md:mb-4 text-slate-300">100% безопасность сделки. Финансовые гарантии нашей платформы и платёжной системы <span className='font-bold text-lime-400'>Alibaba</span> защищают ваши платежи</p>
+          </div>
+          {/* Форма поиска справа на десктопе, снизу на мобиле */}
+          <div className="flex items-center justify-center">
+            <div className="w-full max-w-md lg:max-w-sm">
               <HeroSearchForm />
             </div>
-            {/* Блок с заголовком и описанием */}
-            <div className="flex flex-col items-center lg:items-start justify-center flex-1 max-w-2xl">
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-lg tracking-widest text-slate-100 leading-tight" style={{letterSpacing: '0.04em'}}>Платформа для поиска автомобилей от продавцов из Китая</h1>
-              <p className="text-2xl md:text-3xl font-semibold text-cyan-300 mb-4 drop-shadow">100% безопасность сделки</p>
-              <p className="text-lg md:text-xl mb-0 md:mb-4 text-slate-300">Финансовые гарантии нашей платформы и платёжной системы <span className='font-bold text-lime-400'>Alibaba</span> защищают ваши платежи</p>
-            </div>
           </div>
-        </section>
-
+        </div>
+      </section>
+      {/* Остальной контент ограничен контейнером */}
+      <div className="container mx-auto px-4">
         <div>
           {/* --- Услуги: Антигравийная пленка и Антикоррозийное покрытие --- */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -195,51 +197,62 @@ export default function Home() {
             }
           `}</style>
 
-          {/* Features Section */}
+          {/* Как мы работаем */}
           <section className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold mb-6">Преимущества</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-              <div className="flex items-center bg-white rounded-2xl shadow border-l-4 border-blue-100 p-5 gap-4" style={{borderColor:'#dbeafe'}}>
-                <span className="text-2xl" style={{color:'#60a5fa'}}>🔧</span>
-                <div>
-                  <h3 className="text-lg font-bold mb-1 text-gray-800" style={{fontFamily:'Montserrat, Arial, sans-serif'}}>Техническая проверка</h3>
-                  <p className="text-sm text-gray-500">Техническая проверка и проверка продавца проводятся через наших партнёров в Китае.</p>
-                </div>
+            <h2 className="text-2xl font-bold mb-6 text-blue-600">Как мы работаем</h2>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <div className="bg-blue-50 rounded-2xl shadow p-6 flex flex-col items-center text-center">
+                <AdjustmentsHorizontalIcon className="h-8 w-8 text-blue-500 mb-3" />
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">AI-подбор проверенных автомобилей</h3>
+                <p className="text-gray-600 text-sm">Ежедневно анализируем сотни объявлений с помощью искусственного интеллекта, чтобы исключить автомобили со скрученным пробегом, аварийные и сомнительные варианты. Вы получаете только проверенные предложения с реальными ценами.</p>
               </div>
-              <div className="flex items-center bg-white rounded-2xl shadow border-l-4 border-green-100 p-5 gap-4" style={{borderColor:'#bbf7d0'}}>
-                <span className="text-2xl" style={{color:'#34d399'}}>🤝</span>
-                <div>
-                  <h3 className="text-lg font-bold mb-1 text-gray-800" style={{fontFamily:'Montserrat, Arial, sans-serif'}}>Безопасная сделка</h3>
-                  <p className="text-sm text-gray-500">Сделка оформляется через представителей в Китае и Беларуси.</p>
-                </div>
+              <div className="bg-green-50 rounded-2xl shadow p-6 flex flex-col items-center text-center">
+                <UserGroupIcon className="h-8 w-8 text-green-500 mb-3" />
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">Бесплатный подбор под ваши требования</h3>
+                <p className="text-gray-600 text-sm">Наши менеджеры подберут автомобиль с учетом вашего бюджета, технических предпочтений и дизайна. Мы учитываем все пожелания, чтобы найти идеальный вариант.</p>
               </div>
-              <div className="flex items-center bg-white rounded-2xl shadow border-l-4 border-yellow-100 p-5 gap-4" style={{borderColor:'#fef9c3'}}>
-                <span className="text-2xl" style={{color:'#fde047'}}>💰</span>
-                <div>
-                  <h3 className="text-lg font-bold mb-1 text-gray-800" style={{fontFamily:'Montserrat, Arial, sans-serif'}}>Финансовые гарантии</h3>
-                  <p className="text-sm text-gray-500">Мы предоставляем финансовые гарантии на доставку автомобиля.</p>
-                </div>
+              <div className="bg-yellow-50 rounded-2xl shadow p-6 flex flex-col items-center text-center">
+                <ClipboardIcon className="h-8 w-8 text-yellow-500 mb-3" />
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">Полная проверка истории автомобиля</h3>
+                <p className="text-gray-600 text-sm">Перед покупкой мы проверяем юридическую чистоту автомобиля, подтверждаем реальный пробег, анализируем историю обслуживания и выявляем все факты ДТП, ремонтов и скрытых дефектов.</p>
               </div>
-              <div className="flex items-center bg-white rounded-2xl shadow border-l-4 border-cyan-100 p-5 gap-4" style={{borderColor:'#cffafe'}}>
-                <span className="text-2xl" style={{color:'#22d3ee'}}>🚚</span>
-                <div>
-                  <h3 className="text-lg font-bold mb-1 text-gray-800" style={{fontFamily:'Montserrat, Arial, sans-serif'}}>Доставка</h3>
-                  <p className="text-sm text-gray-500">Доставка осуществляется в Беларусь, Польшу, страны Балтии, Россию и другие страны СНГ.</p>
-                </div>
+              <div className="bg-indigo-50 rounded-2xl shadow p-6 flex flex-col items-center text-center">
+                <ShieldCheckIcon className="h-8 w-8 text-indigo-500 mb-3" />
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">Профессиональный осмотр в Китае</h3>
+                <p className="text-gray-600 text-sm">При оплате через наших партнеров вы получаете бесплатную экспертную диагностику. Проверяем состояние кузова, двигателя, электроники и всех технических узлов.</p>
               </div>
-              <div className="flex items-center bg-white rounded-2xl shadow border-l-4 border-purple-100 p-5 gap-4" style={{borderColor:'#ede9fe'}}>
-                <span className="text-2xl" style={{color:'#a78bfa'}}>🧑‍💼</span>
-                <div>
-                  <h3 className="text-lg font-bold mb-1 text-gray-800" style={{fontFamily:'Montserrat, Arial, sans-serif'}}>Поддержка</h3>
-                  <p className="text-sm text-gray-500">Менеджеры бесплатно помогают подобрать подходящий автомобиль и сопровождают на всех этапах.</p>
-                </div>
+              <div className="bg-red-50 rounded-2xl shadow p-6 flex flex-col items-center text-center">
+                <TruckIcon className="h-8 w-8 text-red-500 mb-3" />
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">Быстрая и надежная доставка</h3>
+                <p className="text-gray-600 text-sm">Сотрудничаем с проверенными логистическими компаниями для оперативной и безопасной доставки. Помогаем с таможенным оформлением и формальностями.</p>
               </div>
-              <div className="flex items-center bg-white rounded-2xl shadow border-l-4 border-gray-200 p-5 gap-4" style={{borderColor:'#e5e7eb'}}>
-                <span className="text-2xl" style={{color:'#9ca3af'}}>ℹ️</span>
-                <div>
-                  <h3 className="text-lg font-bold mb-1 text-gray-800" style={{fontFamily:'Montserrat, Arial, sans-serif'}}>Дополнительно</h3>
-                  <p className="text-sm text-gray-500">В стоимость не входят доставка и таможенные сборы.</p>
-                </div>
+              <div className="bg-pink-50 rounded-2xl shadow p-6 flex flex-col items-center text-center">
+                <CurrencyDollarIcon className="h-8 w-8 text-pink-500 mb-3" />
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">Прозрачные условия без скрытых платежей</h3>
+                <p className="text-gray-600 text-sm">Только честные сделки с гарантией надежности. Наша задача — сделать процесс покупки максимально комфортным и безопасным для вас.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Почему выбирают нас */}
+          <section className="bg-blue-50 rounded-2xl shadow-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold mb-6 text-blue-700">Почему выбирают нас</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="flex items-center bg-white rounded-xl p-5 shadow-sm">
+                <CheckCircleIcon className="h-6 w-6 text-blue-500 mr-4" />
+                <span className="text-gray-800 text-lg">Искусственный интеллект для точного отбора автомобилей.</span>
+              </div>
+              <div className="flex items-center bg-white rounded-xl p-5 shadow-sm">
+                <StarIcon className="h-6 w-6 text-green-500 mr-4" />
+                <span className="text-gray-800 text-lg">Прямые контакты с проверенными поставщиками в Китае.</span>
+              </div>
+              <div className="flex items-center bg-white rounded-xl p-5 shadow-sm">
+                <ShieldCheckIcon className="h-6 w-6 text-yellow-500 mr-4" />
+                <span className="text-gray-800 text-lg">Полная проверка перед покупкой.</span>
+              </div>
+              <div className="flex items-center bg-white rounded-xl p-5 shadow-sm">
+                <UserGroupIcon className="h-6 w-6 text-indigo-500 mr-4" />
+                <span className="text-gray-800 text-lg">Профессиональное сопровождение на всех этапах.</span>
               </div>
             </div>
           </section>

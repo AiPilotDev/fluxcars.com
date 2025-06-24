@@ -748,6 +748,19 @@ export default function CarsPage() {
           </div>
         ) : error ? (
           <div className="text-center py-12 text-red-600">{error}</div>
+        ) : cars.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="bg-white rounded-lg shadow-sm p-8">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Нет автомобилей</h3>
+              <p className="text-gray-600 mb-4">Нет автомобилей, подходящих по выбранным параметрам</p>
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Сбросить фильтры
+              </button>
+            </div>
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

@@ -56,3 +56,5 @@ next.config.mjs
 postcss.config.mjs
 tailwind.config.js
 eslint.config.mjs
+
+public/robots.txt

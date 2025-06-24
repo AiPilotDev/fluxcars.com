@@ -12,7 +12,7 @@ export default function Navigation() {
   const menuItems = [
     { href: '/', label: 'Главная' },
     { href: '/cars', label: 'Поиск авто' },
-    { href: '/about', label: 'О компании' },
+    { href: '/about', label: 'О проекте' },
     { href: '/partners', label: 'Партнеры' },
     { href: '/contacts', label: 'Контакты' },
   ];

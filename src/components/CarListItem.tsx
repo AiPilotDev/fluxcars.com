@@ -48,15 +48,25 @@ export default function CarListItem({ car }: CarListItemProps) {
 
       {/* Content Section */}
       <div className="p-4">
+        {/* Car Name */}
+        <div className="mb-2">
+          <h2
+            className="text-lg font-bold text-gray-900 truncate max-w-[250px]"
+            title={car.carname}
+            suppressHydrationWarning
+          >
+            {car.carname}
+          </h2>
+        </div>
         {/* Title and Year */}
         <div className="flex justify-between items-start mb-3">
           <div className="space-y-1">
-            <h3 className="text-lg font-semibold text-gray-900" suppressHydrationWarning>
+            <div className="text-base text-gray-700 font-medium" suppressHydrationWarning>
               Model: {car.model}
-            </h3>
-            <h4 className="text-base text-gray-600" suppressHydrationWarning>
-            Brand: {car.brand} 
-            </h4>
+            </div>
+            <div className="text-base text-gray-700 font-medium" suppressHydrationWarning>
+              Brand: {car.brand}
+            </div>
           </div>
           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded" suppressHydrationWarning>
             {car.year}

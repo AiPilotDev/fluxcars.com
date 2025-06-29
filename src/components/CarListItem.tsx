@@ -53,7 +53,6 @@ export default function CarListItem({ car }: CarListItemProps) {
           <h2
             className="text-lg font-bold text-gray-900 truncate max-w-[250px]"
             title={car.carname}
-            suppressHydrationWarning
           >
             {car.carname}
           </h2>
@@ -61,22 +60,22 @@ export default function CarListItem({ car }: CarListItemProps) {
         {/* Title and Year */}
         <div className="flex justify-between items-start mb-3">
           <div className="space-y-1">
-            <div className="text-base text-gray-700 font-medium" suppressHydrationWarning>
+            <div className="text-base text-gray-700 font-medium">
               Model: {car.model}
             </div>
-            <div className="text-base text-gray-700 font-medium" suppressHydrationWarning>
+            <div className="text-base text-gray-700 font-medium">
               Brand: {car.brand}
             </div>
           </div>
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded" suppressHydrationWarning>
+          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
             {car.year}
           </span>
         </div>
 
         {/* Price */}
         <div className="mb-4">
-          <p className="text-xl font-bold text-blue-600" suppressHydrationWarning>
-            ${isClient ? formatNumber(car.price) : car.price.toLocaleString()}
+          <p className="text-xl font-bold text-blue-600">
+            {car.price.toLocaleString('ru-RU')}
           </p>
         </div>
 
@@ -86,7 +85,7 @@ export default function CarListItem({ car }: CarListItemProps) {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span suppressHydrationWarning>{isClient ? formatNumber(car.mileage) : car.mileage.toLocaleString()} км</span>
+            <span>{car.mileage.toLocaleString('ru-RU')} км</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

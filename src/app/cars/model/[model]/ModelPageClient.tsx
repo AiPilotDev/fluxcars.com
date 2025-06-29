@@ -128,7 +128,6 @@ export default function ModelPageClient({
   initialSortOrder,
 }: ModelPageClientProps) {
   const searchParams = useSearchParams();
-  const [isClient, setIsClient] = useState(false);
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -157,26 +156,17 @@ export default function ModelPageClient({
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
-  // Set isClient to true after component mounts
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   // Sync currentPage with URL parameters
   useEffect(() => {
-    if (!isClient) return;
-    
     const pageParam = searchParams?.get('page');
     const newPage = pageParam ? Number(pageParam) : 1;
     if (newPage !== currentPage) {
       setCurrentPage(newPage);
     }
-  }, [searchParams, currentPage, isClient]);
+  }, [searchParams]);
 
   // Load cars when parameters change
   useEffect(() => {
-    if (!isClient) return;
-    
     const loadCars = async () => {
       try {
         setLoading(true);
@@ -192,7 +182,7 @@ export default function ModelPageClient({
     };
 
     loadCars();
-  }, [initialModel, currentPage, sortConfig, filters, isClient]);
+  }, [initialModel, currentPage, sortConfig, filters]);
 
   const handleSort = (field: SortField) => {
     setSortConfig(prev => ({
@@ -227,58 +217,56 @@ export default function ModelPageClient({
     setCurrentPage(1);
   };
 
-  const fetchFilterOptions = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars?filter[model][_eq]=${initialModel}&fields=year,color,engine_volume,price,mileage`);
-      const data = await response.json();
-      
-      const years = Array.from(new Set(data.data.map((car: Car) => car.year)))
-        .filter((year: unknown): year is number => typeof year === 'number')
-        .sort((a, b) => b - a);
-      
-      const colors = Array.from(new Set(data.data.map((car: Car) => car.color)))
-        .filter((color: unknown): color is string => typeof color === 'string');
-      
-      const engineVolumes = Array.from(new Set(data.data.map((car: Car) => car.engine_volume)))
-        .filter((volume: unknown): volume is number => typeof volume === 'number')
-        .sort((a, b) => a - b);
-      
-      const prices = data.data
-        .map((car: Car) => car.price)
-        .filter((price: unknown): price is number => typeof price === 'number');
-      
-      const mileages = data.data
-        .map((car: Car) => car.mileage)
-        .filter((mileage: unknown): mileage is number => typeof mileage === 'number');
-      
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-      const minMileage = Math.min(...mileages);
-      const maxMileage = Math.max(...mileages);
-
-      setFilterOptions({
-        years,
-        mileageRanges: [minMileage, maxMileage],
-        priceRanges: [minPrice, maxPrice],
-        colors,
-        engineVolumes
-      });
-
-      setFilters(prev => ({
-        ...prev,
-        priceRange: [minPrice, maxPrice],
-        mileageRange: [minMileage, maxMileage]
-      }));
-    } catch (err) {
-      console.error('Error fetching filter options:', err);
-    }
-  };
-
   useEffect(() => {
-    if (isClient) {
-      fetchFilterOptions();
-    }
-  }, [initialModel, isClient, fetchFilterOptions]);
+    const fetchFilterOptions = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars?filter[model][_eq]=${initialModel}&fields=year,color,engine_volume,price,mileage`);
+        const data = await response.json();
+        
+        const years = Array.from(new Set(data.data.map((car: Car) => car.year)))
+          .filter((year: unknown): year is number => typeof year === 'number')
+          .sort((a, b) => b - a);
+        
+        const colors = Array.from(new Set(data.data.map((car: Car) => car.color)))
+          .filter((color: unknown): color is string => typeof color === 'string');
+        
+        const engineVolumes = Array.from(new Set(data.data.map((car: Car) => car.engine_volume)))
+          .filter((volume: unknown): volume is number => typeof volume === 'number')
+          .sort((a, b) => a - b);
+        
+        const prices = data.data
+          .map((car: Car) => car.price)
+          .filter((price: unknown): price is number => typeof price === 'number');
+        
+        const mileages = data.data
+          .map((car: Car) => car.mileage)
+          .filter((mileage: unknown): mileage is number => typeof mileage === 'number');
+        
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        const minMileage = Math.min(...mileages);
+        const maxMileage = Math.max(...mileages);
+
+        setFilterOptions({
+          years,
+          mileageRanges: [minMileage, maxMileage],
+          priceRanges: [minPrice, maxPrice],
+          colors,
+          engineVolumes
+        });
+
+        setFilters(prev => ({
+          ...prev,
+          priceRange: [minPrice, maxPrice],
+          mileageRange: [minMileage, maxMileage]
+        }));
+      } catch (err) {
+        console.error('Error fetching filter options:', err);
+      }
+    };
+
+    fetchFilterOptions();
+  }, [initialModel]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -382,37 +370,39 @@ export default function ModelPageClient({
               </div>
             </div>
 
-            {!isClient || loading ? (
+            {!loading ? (
+              error ? (
+                <div className="text-center py-12 text-red-600">{error}</div>
+              ) : cars.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="bg-white rounded-lg shadow-sm p-8">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Авто не существует</h3>
+                    <p className="text-gray-600 mb-4">По выбранным критериям не найдено автомобилей</p>
+                    <button
+                      onClick={clearFilters}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      Сбросить фильтры
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {cars.map((car) => (
+                      <CarListItem key={car.infoid} car={car} />
+                    ))}
+                  </div>
+
+                  {totalPages > 1 && (
+                    <Pagination totalPages={totalPages} currentPage={currentPage} />
+                  )}
+                </>
+              )
+            ) : (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
               </div>
-            ) : error ? (
-              <div className="text-center py-12 text-red-600">{error}</div>
-            ) : cars.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="bg-white rounded-lg shadow-sm p-8">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Авто не существует</h3>
-                  <p className="text-gray-600 mb-4">По выбранным критериям не найдено автомобилей</p>
-                  <button
-                    onClick={clearFilters}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                  >
-                    Сбросить фильтры
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {cars.map((car) => (
-                    <CarListItem key={car.infoid} car={car} />
-                  ))}
-                </div>
-
-                {totalPages > 1 && (
-                  <Pagination totalPages={totalPages} currentPage={currentPage} />
-                )}
-              </>
             )}
           </div>
 

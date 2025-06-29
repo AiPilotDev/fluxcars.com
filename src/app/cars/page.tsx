@@ -1,7 +1,7 @@
 // src/app/cars/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { ChevronLeft, ChevronRight, Car, ArrowUpDown, X, Search } from 'lucide-react';
 import { Car as CarType } from '@/types/directus';
 import { directusAPI } from '@/lib/directus';
@@ -43,7 +43,7 @@ interface FilterOptions {
   engineVolumes: number[];
 }
 
-export default function CarsPage() {
+function CarsPageInner() {
   console.log('CarsPage render'); // Диагностика рендера
   const [cars, setCars] = useState<CarType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,7 +115,7 @@ export default function CarsPage() {
         setError(null);
         
         // Формируем параметры запроса
-        const params: Record<string, any> = {
+        const params: Record<string, unknown> = {
           limit: ITEMS_PER_PAGE,
           page: currentPage,
           sort: `${sortConfig.order === 'desc' ? '-' : ''}${sortConfig.field}`,
@@ -123,7 +123,7 @@ export default function CarsPage() {
         };
 
         // Формируем фильтры
-        const apiFilters: Record<string, any> = {};
+        const apiFilters: Record<string, unknown> = {};
         
         // Добавляем поисковый запрос
         const searchValue = filters.search?.trim();
@@ -779,5 +779,13 @@ export default function CarsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function CarsPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-12">Загрузка...</div>}>
+      <CarsPageInner />
+    </Suspense>
   );
 }

@@ -5,23 +5,17 @@ import Link from 'next/link';
 import { directusAPI } from '@/lib/directus';
 import { Car } from '@/types/directus';
 import { 
-  ChevronUpIcon, 
-  ChevronDownIcon,
   AdjustmentsHorizontalIcon,
-  XMarkIcon,
   CheckCircleIcon,
   ShieldCheckIcon,
   TruckIcon,
   CurrencyDollarIcon,
   UserGroupIcon,
   ClipboardIcon,
-  StarIcon,
-  QuestionMarkCircleIcon
+  StarIcon
 } from '@heroicons/react/24/outline';
 import CarListItem from '@/components/CarListItem';
-import InfoBlocks from '@/components/InfoBlocks';
 import { formatError } from '@/utils/formatError';
-import { formatPrice } from '@/utils/formatPrice';
 import { useRouter } from 'next/navigation';
 
 interface TopBrand {
@@ -36,22 +30,11 @@ if (!directusUrl) {
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
-  const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const [itemsPerPage] = useState(12);
-  const [sortField, setSortField] = useState<string>('');
-  const [sortDirection, setSortDirection] = useState<'+' | '-'>('+');
-  const [showFeatures, setShowFeatures] = useState(false);
   const [topBrands, setTopBrands] = useState<TopBrand[]>([]);
-  const [featuredCars, setFeaturedCars] = useState<Car[]>([]);
   const [newCars, setNewCars] = useState<Car[]>([]);
-
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
-
-  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -61,26 +44,21 @@ export default function Home() {
     if (mounted) {
       loadData();
       loadTopBrands();
-      loadFeaturedCars();
       loadNewCars();
     }
-  }, [mounted, currentPage, sortField, sortDirection]);
+  }, [mounted]);
 
   const loadData = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const params: Record<string, any> = {
+      const params: Record<string, unknown> = {
         limit: itemsPerPage,
-        page: currentPage,
-        sort: sortField ? `${sortDirection}${sortField}` : undefined,
         meta: 'total_count,filter_count'
       };
 
       const response = await directusAPI.getCars(params);
-      setCars(response.data);
-      setTotalCount(response.meta?.total_count || 0);
       console.log('Всего авто:', response.data.length, 'Новых авто:', response.data.filter(car => car.condition === 'New').length, response.data.map(car => car.condition));
     } catch (err) {
       console.error('Error fetching cars:', formatError(err));
@@ -111,22 +89,6 @@ export default function Home() {
       }
     } catch (err) {
       console.error('Error fetching top brands:', err);
-    }
-  };
-
-  const loadFeaturedCars = async () => {
-    try {
-      const response = await directusAPI.getCars({
-        limit: 1000
-      });
-
-      if (response.data.length > 0) {
-        // Get 3 random cars
-        const shuffled = [...response.data].sort(() => 0.5 - Math.random());
-        setFeaturedCars(shuffled.slice(0, 3));
-      }
-    } catch (err) {
-      console.error('Error fetching featured cars:', err);
     }
   };
 

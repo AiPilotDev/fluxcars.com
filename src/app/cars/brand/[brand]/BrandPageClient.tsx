@@ -278,7 +278,7 @@ export default function BrandPageClient({
     if (isClient) {
       fetchFilterOptions();
     }
-  }, [initialBrand, isClient]);
+  }, [initialBrand, isClient, fetchFilterOptions]);
 
   return (
     <div className="min-h-screen bg-gray-50">

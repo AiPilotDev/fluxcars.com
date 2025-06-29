@@ -278,7 +278,7 @@ export default function ModelPageClient({
     if (isClient) {
       fetchFilterOptions();
     }
-  }, [initialModel, isClient]);
+  }, [initialModel, isClient, fetchFilterOptions]);
 
   return (
     <div className="min-h-screen bg-gray-50">

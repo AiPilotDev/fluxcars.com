@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Car as CarType } from '@/types/directus';
-import { formatPrice } from '@/lib/directus';
+import { formatPrice } from '@/utils/formatPrice';
 import { getImageUrl } from '@/utils/getImageUrl';
 
 interface CarCardProps {
@@ -60,7 +60,7 @@ export default function CarCard({ car }: CarCardProps) {
         <div className="mt-4 pt-4 border-t border-gray-100">
           <div className="flex justify-between items-center">
             <Link 
-              href={`/cars/${car.infoid}`} 
+              href={`/cars/${car.infoid}`}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
             >
               Подробнее
@@ -73,4 +73,4 @@ export default function CarCard({ car }: CarCardProps) {
       </div>
     </div>
   );
-} 
+}

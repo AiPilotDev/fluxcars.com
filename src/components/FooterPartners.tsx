@@ -14,11 +14,7 @@ export default function FooterPartners() {
             China Trade register number: 9134 0104 MA8P 0XN19J
           </p>
         </div>
-        <div className="pt-2">
-          <Link href="/partners" className="text-blue-400 hover:text-blue-300 transition-colors">
-            Все партнеры →
-          </Link>
-        </div>
+       
         <div>
           <Link href="https://cmotor.pl" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">
             Samochody z Chin →

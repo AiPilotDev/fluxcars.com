@@ -364,11 +364,11 @@ export async function generateMetadata({ params }: { params: Promise<{ infoid: s
   }
 
   return {
-    title: `${car.carname} - ${car.brand} ${car.model} ${car.year}`,
-    description: `${car.brand} ${car.model} ${car.year} года. ${car.condition}, ${car.transmission}, ${car.fuel_type}. Цена: $${car.price.toLocaleString()}`,
+    title: `Купить ${car.carname} в Китае - ${car.year} г. Стоимость ${car.price}|${car.color}`,
+    description: `Покупка и доставка ${car.carname} из Китая. Стоимость $${car.price}. Цвет: ${car.color} Марка: ${car.brand}. Модель: ${car.model} ${car.year} года -${car.fuel_type}`,
     openGraph: {
-      title: `${car.carname} - ${car.brand} ${car.model} ${car.year}`,
-      description: `${car.brand} ${car.model} ${car.year} года. ${car.condition}, ${car.transmission}, ${car.fuel_type}. Цена: $${car.price.toLocaleString()}`,
+      title: `Купить ${car.carname} в Китае - ${car.year} г. Стоимость ${car.price}|${car.color}`,
+      description: `Покупка и доставка ${car.carname} из Китая. Стоимость $${car.price}. Цвет: ${car.color} Марка: ${car.brand}. Модель: ${car.model} ${car.year} года -${car.fuel_type}`,
       type: 'website',
       locale: 'ru_RU',
     }

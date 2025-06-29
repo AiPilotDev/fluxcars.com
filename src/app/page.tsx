@@ -133,7 +133,6 @@ export default function Home() {
   const loadNewCars = async () => {
     try {
       const response = await directusAPI.getCars({
-        filter: { condition: { _eq: 'New' } },
         sort: '-date_created',
         limit: 8
       });

@@ -413,17 +413,26 @@ export default function ModelPageClient({
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Марка</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {Array.from(new Set(cars.map(car => car.brand))).map(brand => (
-                        <Link
-                          key={brand}
-                          href={`/cars/brand/${encodeURIComponent(brand)}`}
-                          className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                          {brand}
-                        </Link>
-                      ))}
-                    </div>
+                    {loading ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {Array.from(new Set(cars.map(car => car.brand))).map(brand => (
+                          <Link
+                            key={brand}
+                            href={`/cars/brand/${encodeURIComponent(brand)}`}
+                            className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
+                          >
+                            {brand}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

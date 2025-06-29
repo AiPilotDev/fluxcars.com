@@ -1,5 +1,5 @@
 'use client';
-import { CheckCircle, ShieldCheck, Users, Zap, Car, Search, Truck, FileText, Globe, DollarSign, FileCheck2, ClipboardCheck, Banknote } from 'lucide-react';
+import { ShieldCheck, Users, Zap, Search, FileText, Globe, DollarSign, FileCheck2, ClipboardCheck, Banknote } from 'lucide-react';
 
 const problemsData = [
   {

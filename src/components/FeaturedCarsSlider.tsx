@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Car } from '@/types/directus';
@@ -14,9 +14,9 @@ interface FeaturedCarsSliderProps {
 export default function FeaturedCarsSlider({ cars }: FeaturedCarsSliderProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % cars.length);
-  };
+  }, [cars.length]);
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + cars.length) % cars.length);

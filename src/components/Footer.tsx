@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { Copyright } from './Copyright';
 import FooterPartners from './FooterPartners';
 import FooterContacts from './FooterContacts';
 import FooterLegal from './FooterLegal';

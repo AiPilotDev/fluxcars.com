@@ -12,11 +12,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch cars' }, { status: 500 });
     }
     const data = await res.json();
-    const cars = data.data || [];
-    const brands = Array.from(new Set(cars.map((c: any) => c.brand))).filter(Boolean).sort();
-    const years = Array.from(new Set(cars.map((c: any) => c.year))).filter(Boolean).sort((a, b) => Number(b) - Number(a));
+    const cars: { brand: string; year: number }[] = data.data || [];
+    const brands = Array.from(new Set(cars.map(c => c.brand))).filter(Boolean).sort();
+    const years = Array.from(new Set(cars.map(c => c.year))).filter(Boolean).sort((a, b) => Number(b) - Number(a));
     return NextResponse.json({ brands, years });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 } 

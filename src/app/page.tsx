@@ -326,8 +326,7 @@ function HeroSearchForm() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    // Имитация загрузки брендов/моделей (лучше вынести в API)
-    fetch('/api/cars/filter-options').then(res => res.json()).then(data => {
+    fetch('/api/cars/filter-options').then(res => res.json()).then((data: { brands: string[] }) => {
       setBrands(data.brands || []);
     });
   }, []);
@@ -336,13 +335,13 @@ function HeroSearchForm() {
     if (brand) {
       fetch(`/api/cars/models?brand=${encodeURIComponent(brand)}`)
         .then(res => res.json())
-        .then(data => setModels(data.models || []));
+        .then((data: { models: string[] }) => setModels(data.models || []));
     } else {
       setModels([]);
     }
   }, [brand]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (search) params.append('search', search);

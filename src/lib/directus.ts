@@ -2,7 +2,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Car, DirectusResponse } from '@/types/directus';
 import { formatError } from '@/utils/formatError';
-import { formatPrice } from '@/utils/formatPrice';
 
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL;
 if (!DIRECTUS_URL) {

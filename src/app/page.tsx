@@ -134,6 +134,7 @@ export default function Home() {
     try {
       const response = await directusAPI.getCars({
         filter: { condition: { _eq: 'New' } },
+        sort: '-date_created',
         limit: 8
       });
       setNewCars(response.data);

@@ -28,7 +28,11 @@ async function getAllBrands(): Promise<BrandsResponse> {
     }
 
     const data = await response.json() as DirectusResponse<Car>;
-    const uniqueBrands = [...new Set(data.data.map(car => car.brand))].sort();
+    // Строгая нормализация брендов: trim, toUpperCase, фильтрация пустых, сортировка, удаление дубликатов
+    const normalizedBrands = data.data
+      .map(car => car.brand?.trim().toUpperCase())
+      .filter(Boolean);
+    const uniqueBrands = [...new Set(normalizedBrands)].sort();
     
     return {
       brands: uniqueBrands,

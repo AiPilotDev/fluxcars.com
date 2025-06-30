@@ -156,15 +156,6 @@ export default function BrandPageClient({
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
-  // Sync currentPage with URL parameters
-  useEffect(() => {
-    const pageParam = searchParams?.get('page');
-    const newPage = pageParam ? Number(pageParam) : 1;
-    if (newPage !== currentPage) {
-      setCurrentPage(newPage);
-    }
-  }, [searchParams]);
-
   // Load cars when parameters change
   useEffect(() => {
     const loadCars = async () => {

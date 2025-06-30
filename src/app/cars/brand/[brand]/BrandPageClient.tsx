@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import CarListItem from '@/components/CarListItem';
 import Pagination from '@/components/Pagination';
 import { Car } from '@/types/directus';
@@ -127,7 +126,6 @@ export default function BrandPageClient({
   initialSortField,
   initialSortOrder,
 }: BrandPageClientProps) {
-  const searchParams = useSearchParams();
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

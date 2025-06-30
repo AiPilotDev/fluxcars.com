@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Car, ArrowUpDown, X, Search } from 'lucide-react';
 import { Car as CarType } from '@/types/directus';
 import { directusAPI } from '@/lib/directus';

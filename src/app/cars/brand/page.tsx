@@ -20,7 +20,7 @@ async function getAllBrands(): Promise<BrandsResponse> {
     url.searchParams.append('limit', '1000');
     url.searchParams.append('sort', 'brand');
     
-    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
+    const response = await fetch(url.toString(), { next: { revalidate: 0 }, headers: { 'Content-Type': 'application/json' } });
     
     if (!response.ok) {
       console.error('Failed to fetch brands:', response.status, response.statusText);

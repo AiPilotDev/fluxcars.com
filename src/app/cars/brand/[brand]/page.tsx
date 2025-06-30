@@ -13,9 +13,8 @@ export async function generateMetadata({
   const decodedBrand = decodeURIComponent(brand);
 
   return {
-    title: `Купить авто ${decodedBrand} в Беларуси`,
-    description: `Купить автомобиль ${decodedBrand} в Беларуси. Большой выбор новых и подержанных авто ${decodedBrand} с гарантией. Цены от официальных дилеров и частных продавцов. ${decodedBrand} в Минске, Гомеле, Бресте и других городах Беларуси.`,
-    keywords: `${decodedBrand}, купить ${decodedBrand}, автомобили ${decodedBrand}, авто ${decodedBrand} Беларусь, ${decodedBrand} Минск`,
+    title: `Каталог авто ${decodedBrand} из Китая на FluxCars`,
+    description: `Покупка ${decodedBrand} в Китае на FluxCars. Поиск и доставка из любой точки Китая ${decodedBrand} с гарантией. Цены от официальных дилеров и частных продавцов. ${decodedBrand} Доставка по всему миру.`,
   };
 }
 

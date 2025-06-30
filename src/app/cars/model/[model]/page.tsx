@@ -41,19 +41,16 @@ export async function generateMetadata({
   const brand = await getBrandFromModel(decodedModel);
   
   const title = brand 
-    ? `Купить авто ${brand} ${decodedModel}`
-    : `Купить авто ${decodedModel}`;
+    ? `Автомобили ${brand} модели ${decodedModel} из Китая. Выкуп и доставка`
+    : `Купить авто ${decodedModel} в Китае`;
     
   const description = brand
-    ? `Широкий выбор автомобилей ${brand} ${decodedModel} в Беларуси. Новые и подержанные авто ${brand} ${decodedModel} с гарантией. Лучшие цены на ${brand} ${decodedModel} в Минске и по всей Беларуси.`
-    : `Широкий выбор автомобилей ${decodedModel} в Беларуси. Новые и подержанные авто ${decodedModel} с гарантией. Лучшие цены на ${decodedModel} в Минске и по всей Беларуси.`;
-
+    ? `Автомобили ${brand} модели ${decodedModel} из Китая. Выкуп и доставка`
+    : ` ${decodedModel} поиск и покупка в Китае. Новые и б/у ${decodedModel}`;
+  
   return {
     title,
-    description,
-    keywords: brand 
-      ? `${brand} ${decodedModel}, купить ${brand} ${decodedModel}, автомобили ${brand} ${decodedModel}, авто ${brand} ${decodedModel} Беларусь, ${brand} ${decodedModel} Минск`
-      : `${decodedModel}, купить ${decodedModel}, автомобили ${decodedModel}, авто ${decodedModel} Беларусь, ${decodedModel} Минск`,
+    description
   };
 }
 

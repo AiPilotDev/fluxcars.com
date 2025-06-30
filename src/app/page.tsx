@@ -38,15 +38,10 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+    loadData();
+    loadTopBrands();
+    loadNewCars();
   }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      loadData();
-      loadTopBrands();
-      loadNewCars();
-    }
-  }, [mounted]);
 
   const loadData = async () => {
     try {

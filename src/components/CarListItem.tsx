@@ -3,24 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Car } from '@/types/directus';
-import { useEffect, useState } from 'react';
 import { getImageUrl } from '@/utils/getImageUrl';
 
 interface CarListItemProps {
   car: Car;
 }
 
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat('en-US').format(num);
-};
-
 export default function CarListItem({ car }: CarListItemProps) {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
   const imageUrl = getImageUrl(car.thumbnail, directusUrl);
 
@@ -53,6 +42,7 @@ export default function CarListItem({ car }: CarListItemProps) {
           <h2
             className="text-lg font-bold text-gray-900 truncate max-w-[250px]"
             title={car.carname}
+            suppressHydrationWarning
           >
             {car.carname}
           </h2>

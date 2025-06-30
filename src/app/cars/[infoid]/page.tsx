@@ -115,7 +115,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-indigo-900 to-purple-900 text-white w-full">
         <div className="container mx-auto px-4 py-6 sm:py-12 max-w-full sm:max-w-7xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4" suppressHydrationWarning>
              {car.carname} - {car.fuel_type}
           </h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-200 text-sm sm:text-base">
@@ -163,7 +163,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
               {/* Price Card */}
               <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-2xl font-bold mb-4">Цена</h2>
+                  <h2 className="text-2xl font-bold mb-4" suppressHydrationWarning>Цена</h2>
                   <div className="space-y-2">
                     <p className="text-4xl font-bold">{formattedPrice}</p>
                     {car.delivery_price > 0 && (
@@ -177,7 +177,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
             {/* Additional Info Card */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Дополнительная информация</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Дополнительная информация</h2>
                 <div className="space-y-4">
                   <InfoItem label="Пробег" value={formattedMileage ? `${formattedMileage} км` : null} />
                   <InfoItem label="Год выпуска" value={car.year?.toString()} />
@@ -190,7 +190,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
             {/* Technical Specifications */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Технические характеристики</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Технические характеристики</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <InfoItem label="Объем двигателя" value={car.engine_volume ? `${car.engine_volume} л` : null} />
@@ -214,7 +214,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
             <div className="lg:hidden space-y-8">
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">Связаться с нами</h2>
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Связаться с нами</h2>
                   <div className="space-y-4">
                     <a
                       href={`https://t.me/chinamotor_bot`}
@@ -258,7 +258,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
             {/* Description */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Описание</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Описание</h2>
                 <DescriptionWrapper description={car.description} />
               </div>
             </div>
@@ -273,7 +273,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
               {/* Price Card */}
               <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-2xl font-bold mb-4">Цена</h2>
+                  <h2 className="text-2xl font-bold mb-4" suppressHydrationWarning>Цена</h2>
                   <div className="space-y-2">
                     <p className="text-4xl font-bold">{formattedPrice}</p>
                     {car.delivery_price > 0 && (
@@ -286,7 +286,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
               {/* Contact Card (Moved) */}
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="p-6">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">Связаться с нами</h2>
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4" suppressHydrationWarning>Связаться с нами</h2>
                   <div className="space-y-4">
                     <a
                       href={`https://t.me/chinamotor_bot`}

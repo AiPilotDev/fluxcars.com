@@ -17,6 +17,10 @@ interface GetCarsParams {
   meta?: string;
 }
 
+// Кэш для API запросов
+const cache = new Map<string, { data: unknown; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
+
 class DirectusAPI {
   private baseURL: string;
   private token?: string;
@@ -24,6 +28,14 @@ class DirectusAPI {
   constructor(baseURL: string, token?: string) {
     this.baseURL = baseURL;
     this.token = token;
+  }
+
+  private getCacheKey(endpoint: string, params: unknown): string {
+    return `${endpoint}?${JSON.stringify(params)}`;
+  }
+
+  private isCacheValid(timestamp: number): boolean {
+    return Date.now() - timestamp < CACHE_DURATION;
   }
 
   private async request<T>(endpoint: string, options: AxiosRequestConfig = {}): Promise<T> {
@@ -45,14 +57,29 @@ class DirectusAPI {
 
   async getCars(params: GetCarsParams = {}): Promise<DirectusResponse<Car>> {
     try {
+      const cacheKey = this.getCacheKey('/items/Cars', params);
+      const cached = cache.get(cacheKey);
+      
+      if (cached && this.isCacheValid(cached.timestamp)) {
+        return cached.data as DirectusResponse<Car>;
+      }
+
       // Если есть фильтр, сериализуем его как JSON-строку
       const paramsToSend = { ...params };
       if (paramsToSend.filter) {
         paramsToSend.filter = JSON.stringify(paramsToSend.filter);
       }
+      
       const response = await axios.get(`${this.baseURL}/items/Cars`, {
         params: paramsToSend
       });
+      
+      // Сохраняем в кэш
+      cache.set(cacheKey, {
+        data: response.data,
+        timestamp: Date.now()
+      });
+      
       return response.data;
     } catch (error) {
       console.error('Error fetching cars:', error);

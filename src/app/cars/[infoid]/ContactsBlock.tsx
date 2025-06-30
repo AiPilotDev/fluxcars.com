@@ -4,7 +4,7 @@ export default function ContactsBlock() {
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       <div className="p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Контакты</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6" suppressHydrationWarning>Контакты</h2>
         <div className="space-y-3">
           {/* Беларусь */}
           <div className={styles.contactSectionBelarus}>
@@ -12,7 +12,7 @@ export default function ContactsBlock() {
               <div className={styles.countryIcon}>
                 <span className={styles.flagEmoji}>🇧🇾</span>
               </div>
-              <h3 className={styles.contactCountry}>Беларусь</h3>
+              <h3 className={styles.contactCountry} suppressHydrationWarning>Беларусь</h3>
             </div>
             <div className={styles.contactInfo}>
               <a 
@@ -31,7 +31,7 @@ export default function ContactsBlock() {
               <div className={styles.countryIcon}>
                 <span className={styles.flagEmoji}>🇬🇧</span>
               </div>
-              <h3 className={styles.contactCountry}>English speaking support</h3>
+              <h3 className={styles.contactCountry} suppressHydrationWarning>English speaking support</h3>
             </div>
             <div className={styles.contactInfo}>
               <a 
@@ -50,7 +50,7 @@ export default function ContactsBlock() {
               <div className={styles.countryIcon}>
                 <span className={styles.flagEmoji}>🇨🇳</span>
               </div>
-              <h3 className={styles.contactCountry}>Китай</h3>
+              <h3 className={styles.contactCountry} suppressHydrationWarning>Китай</h3>
             </div>
             <div className={styles.contactInfo}>
               <a 
@@ -69,7 +69,7 @@ export default function ContactsBlock() {
               <div className={styles.countryIcon}>
                 <span className={styles.flagEmoji}>🇷🇺</span>
               </div>
-              <h3 className={styles.contactCountry}>РФ</h3>
+              <h3 className={styles.contactCountry} suppressHydrationWarning>РФ</h3>
             </div>
             <div className={styles.contactInfo}>
               <a 
@@ -88,7 +88,7 @@ export default function ContactsBlock() {
               <div className={styles.countryIcon}>
                 <span className={styles.flagEmoji}>📧</span>
               </div>
-              <h3 className={styles.contactCountry}>Email</h3>
+              <h3 className={styles.contactCountry} suppressHydrationWarning>Email</h3>
             </div>
             <div className={styles.contactInfo}>
               <a 

@@ -6,18 +6,31 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Directus URL not set' }, { status: 500 });
   }
   const { searchParams } = new URL(req.url);
-  const brand = searchParams.get('brand');
-  if (!brand) return NextResponse.json({ models: [] });
+  const brand_id = searchParams.get('brand_id');
   try {
-    const res = await fetch(`${directusUrl}/items/Cars?fields=model,brand&filter[brand][_eq]=${encodeURIComponent(brand)}&limit=1000`);
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Failed to fetch models' }, { status: 500 });
+    // Получаем все машины с нужным брендом (если задан)
+    let carsUrl = `${directusUrl}/items/Cars?fields=series_id${brand_id ? ',brand_id' : ''}&limit=1000`;
+    if (brand_id) {
+      carsUrl += `&filter[brand_id][_eq]=${encodeURIComponent(brand_id)}`;
     }
-    const data = await res.json();
-    const cars: { model: string; brand: string }[] = data.data || [];
-    const models = Array.from(new Set(cars.map(c => c.model))).filter(Boolean).sort();
-    return NextResponse.json({ models });
-  } catch {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    const carsRes = await fetch(carsUrl);
+    if (!carsRes.ok) {
+      return NextResponse.json({ error: 'Failed to fetch cars', status: carsRes.status, statusText: carsRes.statusText }, { status: 500 });
+    }
+    const carsData = await carsRes.json();
+    const usedSeriesIds = Array.from(new Set((carsData.data || []).map((c: { series_id: string }) => c.series_id).filter(Boolean)));
+    if (usedSeriesIds.length === 0) return NextResponse.json({ series: [] });
+    // Корректный фильтр для Directus: один параметр filter[id][_in]=id1,id2,id3
+    const filterStr = `filter[id][_in]=${usedSeriesIds.join(',')}`;
+    const seriesRes = await fetch(`${directusUrl}/items/series?fields=id,seriesname&limit=1000&${filterStr}`);
+    if (!seriesRes.ok) {
+      return NextResponse.json({ error: 'Failed to fetch series', status: seriesRes.status, statusText: seriesRes.statusText }, { status: 500 });
+    }
+    const seriesData = await seriesRes.json();
+    const series = (seriesData.data || []).map((s: { id: string; seriesname: string }) => ({ id: s.id, name: s.seriesname }));
+    return NextResponse.json({ series });
+  } catch (err: unknown) {
+    const message = typeof err === 'object' && err && 'message' in err ? (err as any).message : String(err);
+    return NextResponse.json({ error: 'Server error', message }, { status: 500 });
   }
 } 

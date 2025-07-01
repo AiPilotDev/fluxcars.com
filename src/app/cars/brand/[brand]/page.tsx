@@ -1,47 +1,29 @@
-import { Suspense } from 'react';
 import BrandPageClient from './BrandPageClient';
-import { Metadata } from 'next';
+import { fetchBrands } from '@/lib/directus';
 
-type SortField = 'year' | 'mileage' | 'price' | 'date_created';
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ brand: string }>;
-}): Promise<Metadata> {
-  const { brand } = await params;
-  const decodedBrand = decodeURIComponent(brand);
-
+export async function generateMetadata({ params }: { params: { brand: string } }) {
+  const brandName = decodeURIComponent(params.brand);
   return {
-    title: `Каталог авто ${decodedBrand} из Китая на FluxCars`,
-    description: `Покупка ${decodedBrand} в Китае на FluxCars. Поиск и доставка из любой точки Китая ${decodedBrand} с гарантией. Цены от официальных дилеров и частных продавцов. ${decodedBrand} Доставка по всему миру.`,
+    title: `Автомобили ${brandName}`,
+    description: `Купить автомобили ${brandName} из Китая. Каталог, цены, доставка, проверка, подбор.`,
   };
 }
 
-export default async function BrandPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ brand: string }>;
-  searchParams: Promise<{ page?: string; sort?: string }>;
-}) {
-  const { brand } = await params;
-  const decodedBrand = decodeURIComponent(brand);
-  
-  const { page, sort } = await searchParams;
-  const currentPage = Number(page) || 1;
-  
-  const sortField = (sort?.split('-')[1] || 'date_created') as SortField;
-  const sortOrder = sort?.startsWith('-') ? 'desc' : 'asc';
-
+export default async function BrandPage({ params }: { params: { brand: string } }) {
+  const brandParam = decodeURIComponent(params.brand);
+  const brandsRes = await fetchBrands();
+  const brands = brandsRes.data;
+  // ищем по name или id
+  const found = brands.find((b: { id: string; name: string }) => b.id === brandParam || b.name === brandParam);
+  const realBrandName = found?.name || brandParam;
+  const brandId = found?.id ? String(found.id) : '';
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <BrandPageClient
-        initialBrand={decodedBrand}
-        initialPage={currentPage}
-        initialSortField={sortField}
-        initialSortOrder={sortOrder}
-      />
-    </Suspense>
+    <BrandPageClient
+      initialBrand={realBrandName}
+      initialBrandId={brandId}
+      initialPage={1}
+      initialSortField="date_created"
+      initialSortOrder="desc"
+    />
   );
 } 

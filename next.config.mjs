@@ -3,18 +3,12 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '8055',
-        pathname: '/assets/**',
-      },
-      {
         protocol: 'https',
-        hostname: '**.directus.app',
+        hostname: 'api.fluxcars.com',
         pathname: '/assets/**',
       }
     ],
   },
 }
 
-export default nextConfig; 
+export default nextConfig;

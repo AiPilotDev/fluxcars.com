@@ -7,11 +7,15 @@ import { getImageUrl } from '@/utils/getImageUrl';
 
 interface CarListItemProps {
   car: Car;
+  brands: { id: string; name: string }[];
+  seriesList: { id: string; name: string }[];
 }
 
-export default function CarListItem({ car }: CarListItemProps) {
+export default function CarListItem({ car, brands, seriesList }: CarListItemProps) {
   const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
   const imageUrl = getImageUrl(car.thumbnail, directusUrl);
+  const brandName = brands.find(b => b.id === car.brand_id)?.name || '—';
+  const seriesName = seriesList.find(s => s.id === car.series_id)?.name || '—';
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
@@ -19,7 +23,7 @@ export default function CarListItem({ car }: CarListItemProps) {
       <Link href={`/cars/${car.infoid}`} className="block relative h-48 overflow-hidden">
         <Image
           src={imageUrl}
-          alt={`${car.brand} ${car.model}`}
+          alt={`${brandName} ${seriesName}`}
           fill
           className="object-cover transition-transform duration-300 hover:scale-110"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -51,10 +55,10 @@ export default function CarListItem({ car }: CarListItemProps) {
         <div className="flex justify-between items-start mb-3">
           <div className="space-y-1">
             <div className="text-base text-gray-700 font-medium">
-              Model: {car.model}
+              Model: {seriesName}
             </div>
             <div className="text-base text-gray-700 font-medium">
-              Brand: {car.brand}
+              Brand: {brandName}
             </div>
           </div>
           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
@@ -64,8 +68,8 @@ export default function CarListItem({ car }: CarListItemProps) {
 
         {/* Price */}
         <div className="mb-4">
-          <p className="text-xl font-bold text-blue-600">
-            {car.price.toLocaleString('ru-RU')}
+          <p className="text-xl font-bold text-blue-600 flex items-center gap-1">
+            <span className="text-base">$</span>{car.price.toLocaleString('ru-RU')}
           </p>
         </div>
 

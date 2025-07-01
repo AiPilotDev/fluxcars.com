@@ -6,18 +6,22 @@ import { getImageUrl } from '@/utils/getImageUrl';
 
 interface CarCardProps {
   car: CarType;
+  brands: { id: string; name: string }[];
+  seriesList: { id: string; name: string }[];
 }
 
-export default function CarCard({ car }: CarCardProps) {
+export default function CarCard({ car, brands, seriesList }: CarCardProps) {
   const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
   const imageUrl = getImageUrl(car.thumbnail, directusUrl);
+  const brandName = brands.find(b => b.id === car.brand_id)?.name || '—';
+  const seriesName = seriesList.find(s => s.id === car.series_id)?.name || '—';
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative h-48">
         <Image
           src={imageUrl}
-          alt={`${car.brand} ${car.model}`}
+          alt={`${brandName} ${seriesName}`}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -34,7 +38,7 @@ export default function CarCard({ car }: CarCardProps) {
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-base font-semibold text-gray-900">
-            {car.brand} {car.model}
+            {brandName} {seriesName}
           </h3>
           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
             {car.year}

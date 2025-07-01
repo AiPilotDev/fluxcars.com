@@ -7,6 +7,7 @@ import { Car } from '@/types/directus';
 import Link from 'next/link';
 import { ArrowUpDown } from 'lucide-react';
 import { formatError } from '@/utils/formatError';
+import { fetchBrands } from '@/lib/directus';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -151,6 +152,7 @@ export default function ModelPageClient({
     colors: [],
     engineVolumes: []
   });
+  const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
@@ -172,6 +174,10 @@ export default function ModelPageClient({
 
     loadCars();
   }, [initialModel, currentPage, sortConfig, filters]);
+
+  useEffect(() => {
+    fetchBrands().then(res => setBrands(res.data)).catch(() => setBrands([]));
+  }, []);
 
   const handleSort = (field: SortField) => {
     setSortConfig(prev => ({
@@ -379,7 +385,7 @@ export default function ModelPageClient({
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {cars.map((car) => (
-                      <CarListItem key={car.infoid} car={car} />
+                      <CarListItem key={car.infoid} car={car} brands={brands} />
                     ))}
                   </div>
 
@@ -411,15 +417,20 @@ export default function ModelPageClient({
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
-                        {Array.from(new Set(cars.map(car => car.brand))).map(brand => (
-                          <Link
-                            key={brand}
-                            href={`/cars/brand/${encodeURIComponent(brand)}`}
-                            className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
-                          >
-                            {brand}
-                          </Link>
-                        ))}
+                        {Array.from(new Set(cars.map(car => car.brand_id)))
+                          .map(brandId => {
+                            const brand = brands.find(b => b.id === brandId);
+                            if (!brand) return null;
+                            return (
+                              <Link
+                                key={brand.id}
+                                href={`/cars/brand/${encodeURIComponent(brand.name)}`}
+                                className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
+                              >
+                                {brand.name}
+                              </Link>
+                            );
+                          })}
                       </div>
                     )}
                   </div>

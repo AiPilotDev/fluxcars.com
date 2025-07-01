@@ -9,9 +9,11 @@ import { getImageUrl } from '@/utils/getImageUrl';
 
 interface FeaturedCarsSliderProps {
   cars: Car[];
+  brands: { id: string; name: string }[];
+  seriesList: { id: string; name: string }[];
 }
 
-export default function FeaturedCarsSlider({ cars }: FeaturedCarsSliderProps) {
+export default function FeaturedCarsSlider({ cars, brands, seriesList }: FeaturedCarsSliderProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = useCallback(() => {
@@ -43,7 +45,7 @@ export default function FeaturedCarsSlider({ cars }: FeaturedCarsSliderProps) {
             <div className="relative h-full flex">
               {/* Left Card - 1/3 width */}
               <div className="w-1/3 bg-black p-8 flex flex-col justify-center">
-                <h2 className="text-3xl font-bold mb-2 text-white">{car.brand} {car.model}</h2>
+                <h2 className="text-3xl font-bold mb-2 text-white">{brands.find(b => b.id === car.brand_id)?.name || '—'} {seriesList.find(s => s.id === car.series_id)?.name || '—'}</h2>
                 <p className="text-xl mb-6 text-gray-300">Авто из нашей подборки</p>
                 <div className="grid grid-cols-1 gap-6 mb-8">
                   <div>
@@ -75,7 +77,7 @@ export default function FeaturedCarsSlider({ cars }: FeaturedCarsSliderProps) {
               <div className="w-2/3 relative">
                 <Image
                   src={getImage(car.thumbnail)}
-                  alt={`${car.brand} ${car.model}`}
+                  alt={`${brands.find(b => b.id === car.brand_id)?.name || '—'} ${seriesList.find(s => s.id === car.series_id)?.name || '—'}`}
                   fill
                   className="object-cover"
                   sizes="66vw"

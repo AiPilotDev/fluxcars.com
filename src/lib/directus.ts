@@ -1,6 +1,6 @@
 // src/lib/directus.ts
 import axios, { AxiosRequestConfig } from 'axios';
-import { Car, DirectusResponse } from '@/types/directus';
+import { Car, DirectusResponse, Brand } from '@/types/directus';
 import { formatError } from '@/utils/formatError';
 
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL;
@@ -87,6 +87,18 @@ class DirectusAPI {
     }
   }
 
+  async getBrands(): Promise<DirectusResponse<Brand>> {
+    try {
+      const response = await axios.get(`${this.baseURL}/items/brands`, {
+        params: { fields: 'id,name', sort: 'name', limit: 1000 }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching brands:', error);
+      throw error;
+    }
+  }
+
   getAssetUrl(assetId: string, params: {
     width?: number;
     height?: number;
@@ -122,4 +134,8 @@ export async function fetchCars(params: unknown): Promise<DirectusResponse<Car>>
   // Приводим параметры к типу GetCarsParams, если это объект
   const safeParams = typeof params === 'object' && params !== null ? params as GetCarsParams : {};
   return directusAPI.getCars(safeParams);
+}
+
+export async function fetchBrands(): Promise<DirectusResponse<Brand>> {
+  return directusAPI.getBrands();
 }

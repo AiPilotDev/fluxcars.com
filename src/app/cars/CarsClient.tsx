@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Car, ArrowUpDown, X, Search } from 'lucide-react';
-import { Car as CarType } from '@/types/directus';
-import { directusAPI } from '@/lib/directus';
+import { Car as CarType, Brand } from '@/types/directus';
+import { directusAPI, fetchBrands } from '@/lib/directus';
 import CarListItem from '@/components/CarListItem';
 import { formatError } from '@/utils/formatError';
 import { formatPrice } from '@/utils/formatPrice';
@@ -21,7 +21,7 @@ interface SortConfig {
 
 interface Filters {
   brand: string;
-  model: string;
+  series_id: string;
   year: string;
   mileage: string;
   price: string;
@@ -33,8 +33,8 @@ interface Filters {
 }
 
 interface FilterOptions {
-  brands: string[];
-  models: string[];
+  brands: Brand[];
+  seriesList: { id: string; name: string }[];
   years: number[];
   mileageRanges: number[];
   priceRanges: number[];
@@ -51,7 +51,7 @@ export default function CarsClient() {
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'date_created', order: 'desc' });
   const [filters, setFilters] = useState<Filters>({
     brand: '',
-    model: '',
+    series_id: '',
     year: '',
     mileage: '',
     price: '',
@@ -63,7 +63,7 @@ export default function CarsClient() {
   });
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     brands: [],
-    models: [],
+    seriesList: [],
     years: [],
     mileageRanges: [],
     priceRanges: [],
@@ -72,7 +72,6 @@ export default function CarsClient() {
   });
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [brandModelsMap, setBrandModelsMap] = useState<Map<string, string[]>>(new Map());
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -86,7 +85,7 @@ export default function CarsClient() {
   useEffect(() => {
     // Считываем параметры из URL и применяем к фильтрам
     const brand = searchParams?.get('brand') || '';
-    const model = searchParams?.get('model') || '';
+    const series_id = searchParams?.get('series_id') || '';
     const year = searchParams?.get('year') || '';
     const search = searchParams?.get('search') || '';
     const color = searchParams?.get('color') || '';
@@ -96,7 +95,7 @@ export default function CarsClient() {
     setFilters(prev => ({
       ...prev,
       brand,
-      model,
+      series_id,
       year,
       search,
       color,
@@ -105,6 +104,18 @@ export default function CarsClient() {
       mileage
     }));
   }, [searchParams]);
+
+  useEffect(() => {
+    const fetchAllBrands = async () => {
+      try {
+        const res = await fetchBrands();
+        setFilterOptions(prev => ({ ...prev, brands: res.data }));
+      } catch {
+        // ignore
+      }
+    };
+    fetchAllBrands();
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -125,14 +136,13 @@ export default function CarsClient() {
             apiFilters['_and'] = words.map(word => ({
               _or: [
                 { brand: { _icontains: word } },
-                { model: { _icontains: word } },
                 { carname: { _icontains: word } }
               ]
             }));
           }
         }
-        if (filters.brand) apiFilters['brand'] = { _eq: filters.brand };
-        if (filters.model) apiFilters['model'] = { _eq: filters.model };
+        if (filters.brand) apiFilters['brand_id'] = { _eq: filters.brand };
+        if (filters.series_id) apiFilters['series_id'] = { _eq: filters.series_id };
         if (filters.color) apiFilters['color'] = { _eq: filters.color };
         if (filters.engineVolume) {
           const engineVolume = Number(filters.engineVolume);
@@ -163,12 +173,31 @@ export default function CarsClient() {
     loadData();
   }, [currentPage, sortConfig, filters]);
 
-  const handleFilterChange = (field: keyof Filters, value: string) => {
+  const handleFilterChange = async (field: keyof Filters, value: string) => {
     if (field === 'brand') {
-      const models = brandModelsMap.get(value) || [];
-      setFilterOptions(prev => ({ ...prev, models }));
-      setFilters(prev => ({ ...prev, brand: value, model: '' }));
-    } else if (['year', 'mileage', 'price'].includes(field)) {
+      setFilters(prev => ({ ...prev, brand: value, series_id: '' }));
+      if (value) {
+        try {
+          // 1. Получаем все Cars с этим brand_id
+          const carsRes = await fetch(`https://api.fluxcars.com/items/Cars?fields=series_id,brand_id&limit=1000&filter[brand_id][_eq]=${encodeURIComponent(value)}`);
+          const carsData = await carsRes.json();
+          const uniqueSeriesIds = Array.from(new Set((carsData.data || []).map((c: { series_id: string }) => c.series_id).filter(Boolean)));
+          // 2. Получаем series по этим id
+          let seriesList: { id: string; name: string }[] = [];
+          if (uniqueSeriesIds.length > 0) {
+            const filterStr = `filter[id][_in]=${uniqueSeriesIds.join(',')}`;
+            const seriesRes = await fetch(`https://api.fluxcars.com/items/series?fields=id,seriesname&limit=1000&${filterStr}`);
+            const seriesData = await seriesRes.json();
+            seriesList = (seriesData.data || []).map((s: { id: string; seriesname: string }) => ({ id: s.id, name: s.seriesname }));
+          }
+          setFilterOptions(prev => ({ ...prev, seriesList }));
+        } catch {
+          setFilterOptions(prev => ({ ...prev, seriesList: [] }));
+        }
+      } else {
+        setFilterOptions(prev => ({ ...prev, seriesList: [] }));
+      }
+    } else if (["year", "mileage", "price"].includes(field)) {
       const numValue = Number(value);
       if (value === '' || (!isNaN(numValue) && Number.isInteger(numValue))) {
         setFilters(prev => ({ ...prev, [field]: value }));
@@ -201,7 +230,7 @@ export default function CarsClient() {
   const clearFilters = () => {
     setFilters({
       brand: '',
-      model: '',
+      series_id: '',
       year: '',
       mileage: '',
       price: '',
@@ -270,9 +299,8 @@ export default function CarsClient() {
 
   const fetchFilterOptions = async () => {
     try {
-      const result = await directusAPI.getCars({ limit: 1000, sort: 'brand' });
+      const result = await directusAPI.getCars({ limit: 1000, sort: 'brand_id' });
       if (!result?.data) return;
-      const brands = [...new Set(result.data.map(car => car.brand))].sort();
       const years = [...new Set(result.data.map(car => car.year))].sort((a, b) => b - a);
       const colors = [...new Set(result.data.map(car => car.color).filter((color): color is string => Boolean(color)))].sort();
       const engineVolumes = [...new Set(result.data.map(car => car.engine_volume).filter((volume): volume is number => typeof volume === 'number'))].sort((a, b) => a - b);
@@ -280,38 +308,27 @@ export default function CarsClient() {
       const minMileage = Math.min(...result.data.map(car => car.mileage));
       const maxPrice = Math.max(...result.data.map(car => car.price));
       const minPrice = Math.min(...result.data.map(car => car.price));
-      const brandModelsMap = new Map<string, string[]>();
-      result.data.forEach(car => {
-        if (!brandModelsMap.has(car.brand)) brandModelsMap.set(car.brand, []);
-        if (!brandModelsMap.get(car.brand)?.includes(car.model)) brandModelsMap.get(car.brand)?.push(car.model);
-      });
-      brandModelsMap.forEach((models, brand) => {
-        brandModelsMap.set(brand, models.sort());
-      });
-      setFilterOptions({
-        brands,
-        models: [],
+      setFilterOptions(prev => ({
+        ...prev,
+        seriesList: [],
         years,
         mileageRanges: [minMileage, maxMileage],
         priceRanges: [minPrice, maxPrice],
         colors,
         engineVolumes
-      });
-      setBrandModelsMap(brandModelsMap);
+      }));
       setFilters(prev => ({
         ...prev,
         priceRange: [minPrice, maxPrice],
         mileageRange: [minMileage, maxMileage]
       }));
-    } catch (err) {
-      // eslint-disable-next-line
-      console.error('Error fetching filter options:', err);
+    } catch {
+      // ignore
     }
   };
 
   useEffect(() => {
     fetchFilterOptions();
-    // eslint-disable-next-line
   }, []);
 
   const fetchSearchSuggestions = async (query: string) => {
@@ -325,7 +342,6 @@ export default function CarsClient() {
         filter: {
           _or: [
             { brand: { _icontains: query } },
-            { model: { _icontains: query } },
             { carname: { _icontains: query } }
           ]
         }
@@ -333,13 +349,11 @@ export default function CarsClient() {
       const suggestions = new Set<string>();
       response.data.forEach(car => {
         if (car.brand.toLowerCase().includes(query.toLowerCase())) suggestions.add(car.brand);
-        if (car.model.toLowerCase().includes(query.toLowerCase())) suggestions.add(car.model);
         if (car.carname?.toLowerCase().includes(query.toLowerCase())) suggestions.add(car.carname);
       });
       setSearchSuggestions(Array.from(suggestions));
-    } catch (err) {
-      // eslint-disable-next-line
-      console.error('Error fetching search suggestions:', err);
+    } catch {
+      // ignore
     }
   };
 
@@ -446,21 +460,21 @@ export default function CarsClient() {
               >
                 <option value="">Все бренды</option>
                 {filterOptions.brands.map((brand) => (
-                  <option key={brand} value={brand}>{brand}</option>
+                  <option key={brand.id} value={brand.id}>{brand.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Модель</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Серия</label>
               <select
-                value={filters.model}
-                onChange={(e) => handleFilterChange('model', e.target.value)}
+                value={filters.series_id}
+                onChange={(e) => handleFilterChange('series_id', e.target.value)}
                 disabled={!filters.brand}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${!filters.brand ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               >
-                <option value="">Все модели</option>
-                {filterOptions.models.map((model) => (
-                  <option key={model} value={model}>{model}</option>
+                <option value="">Все серии</option>
+                {filterOptions.seriesList.map((series) => (
+                  <option key={series.id} value={series.id}>{series.name}</option>
                 ))}
               </select>
             </div>
@@ -596,7 +610,7 @@ export default function CarsClient() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {cars.map((car) => (
-                <CarListItem key={car.id} car={car} />
+                <CarListItem key={car.id} car={car} brands={filterOptions.brands} seriesList={filterOptions.seriesList} />
               ))}
             </div>
             {totalPages > 1 && (

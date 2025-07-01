@@ -1,56 +1,35 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Car, DirectusResponse } from '@/types/directus';
-import { formatError } from '@/utils/formatError';
+import { Brand } from '@/types/directus';
 
-interface BrandsResponse {
-  brands: string[];
-  total: number;
-}
-
-async function getAllBrands(): Promise<BrandsResponse> {
+async function getAllBrands(): Promise<Brand[]> {
   if (!process.env.NEXT_PUBLIC_DIRECTUS_URL) {
     console.error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
-    return { brands: [], total: 0 };
+    return [];
   }
-
   try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars`);
-    url.searchParams.append('fields', 'brand');
-    url.searchParams.append('limit', '1000');
-    url.searchParams.append('sort', 'brand');
-    
-    const response = await fetch(url.toString(), { next: { revalidate: 0 }, headers: { 'Content-Type': 'application/json' } });
-    
+    const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/brands`);
+    url.searchParams.append('fields', 'id,name');
+    url.searchParams.append('sort', 'name');
+    url.searchParams.append('limit', '100');
+    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
     if (!response.ok) {
       console.error('Failed to fetch brands:', response.status, response.statusText);
-      return { brands: [], total: 0 };
+      return [];
     }
-
-    const data = await response.json() as DirectusResponse<Car>;
-    // Строгая нормализация брендов: trim, toUpperCase, фильтрация пустых, сортировка, удаление дубликатов
-    const normalizedBrands = data.data
-      .map(car => car.brand?.trim().toUpperCase())
-      .filter(Boolean);
-    const uniqueBrands = [...new Set(normalizedBrands)].sort();
-    
-    return {
-      brands: uniqueBrands,
-      total: uniqueBrands.length
-    };
+    const data = await response.json();
+    return data.data as Brand[];
   } catch (error) {
-    console.error('Error fetching brands:', formatError(error));
-    return { brands: [], total: 0 };
+    console.error('Error fetching brands:', error);
+    return [];
   }
 }
 
 export default async function BrandsPage() {
-  const { brands, total } = await getAllBrands();
-  
+  const brands = await getAllBrands();
   if (brands.length === 0) {
     notFound();
   }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -60,22 +39,21 @@ export default async function BrandsPage() {
             Все марки автомобилей
           </h1>
           <p className="text-gray-300 text-lg">
-            Найдено {total} марок
+            Найдено {brands.length} марок
           </p>
         </div>
       </div>
-
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {brands.map((brand: string) => (
+          {brands.map((brand) => (
             <Link
-              key={brand}
-              href={`/cars/brand/${encodeURIComponent(brand)}`}
+              key={brand.id}
+              href={`/cars/brand/${encodeURIComponent(brand.name)}`}
               className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <h2 className="text-xl font-semibold text-gray-900 text-center">
-                {brand}
+                {brand.name}
               </h2>
             </Link>
           ))}

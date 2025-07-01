@@ -8,6 +8,7 @@ import DescriptionWrapper from './DescriptionWrapper';
 import ContactsBlock from './ContactsBlock';
 import { formatError } from '@/utils/formatError';
 import { formatPrice } from '@/utils/formatPrice';
+import { fetchBrands } from '@/lib/directus';
 
 interface CarPageData {
   id: string;
@@ -36,6 +37,7 @@ interface CarPageData {
       id: string;
     };
   }>;
+  brand_id: string;
 }
 
 async function getCar(infoid: number): Promise<CarPageData | null> {
@@ -104,11 +106,13 @@ function InfoItem({ label, value }: { label: string; value: string | number | nu
   );
 }
 
-function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] }) {
+function CarData({ car, allCars, brands }: { car: CarPageData; allCars: DirectusCar[]; brands: { id: string; name: string }[] }) {
   // Format numbers as plain strings to avoid hydration issues
   const formattedPrice = formatPrice(car.price, 'USD');
   const formattedDeliveryPrice = car.delivery_price > 0 ? formatPrice(car.delivery_price, 'USD') : '';
   const formattedMileage = car.mileage ? String(car.mileage) : '';
+  const brandObj = brands.find(b => b.id === car.brand_id);
+  const brandName = brandObj?.name || '—';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -120,10 +124,10 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
           </h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-gray-200 text-sm sm:text-base">
             <Link 
-              href={`/cars/brand/${encodeURIComponent(car.brand)}`}
+              href={`/cars/brand/${encodeURIComponent(brandName)}`}
               className="hover:text-white transition-colors"
             >
-              {car.brand}
+              {brandName}
             </Link>
             <span>•</span>
             <Link 
@@ -181,7 +185,7 @@ function CarData({ car, allCars }: { car: CarPageData; allCars: DirectusCar[] })
                 <div className="space-y-4">
                   <InfoItem label="Пробег" value={formattedMileage ? `${formattedMileage} км` : null} />
                   <InfoItem label="Год выпуска" value={car.year?.toString()} />
-                  <InfoItem label="Марка" value={car.brand} />
+                  <InfoItem label="Марка" value={brandName} />
                   <InfoItem label="Модель" value={car.model} />
                 </div>
               </div>
@@ -339,17 +343,16 @@ export default async function CarPage({ params }: { params: Promise<{ infoid: st
   if (isNaN(infoidNum)) {
     notFound();
   }
-
-  const [car, allCars] = await Promise.all([
+  const [car, allCars, brandsRes] = await Promise.all([
     getCar(infoidNum),
-    getAllCars()
+    getAllCars(),
+    fetchBrands()
   ]);
-
+  const brands = brandsRes.data;
   if (!car) {
     notFound();
   }
-
-  return <CarData car={car} allCars={allCars} />;
+  return <CarData car={car} allCars={allCars} brands={brands} />;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ infoid: string }> }): Promise<Metadata> {

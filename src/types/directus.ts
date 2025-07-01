@@ -5,6 +5,7 @@ export interface Car {
   infoid: number;
   carname: string;
   brand: string;
+  brand_id: string;
   model: string;
   year: number;
   mileage: number;
@@ -16,6 +17,8 @@ export interface Car {
   color?: string;
   engine_volume?: number;
   condition?: string;
+  series_id?: string;
+  series?: Series;
 }
 
 export interface DirectusResponse<T = unknown> {
@@ -33,4 +36,15 @@ export interface DirectusError {
       code: string;
     };
   }>;
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+}
+
+export interface Series {
+  id: string;
+  name: string;
+  brand_id: string;
 }

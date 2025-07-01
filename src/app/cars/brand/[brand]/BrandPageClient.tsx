@@ -7,6 +7,7 @@ import { Car } from '@/types/directus';
 import Link from 'next/link';
 import { ArrowUpDown } from 'lucide-react';
 import { formatError } from '@/utils/formatError';
+import { fetchBrands } from '@/lib/directus';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -38,13 +39,14 @@ interface FilterOptions {
 
 interface BrandPageClientProps {
   initialBrand: string;
+  initialBrandId: string;
   initialPage: number;
   initialSortField: SortField;
   initialSortOrder: SortOrder;
 }
 
 async function getCarsByBrand(
-  brand: string, 
+  brandId: string, 
   page: number = 1, 
   sortField: SortField = 'date_created', 
   sortOrder: SortOrder = 'desc',
@@ -59,8 +61,8 @@ async function getCarsByBrand(
     const offset = (page - 1) * ITEMS_PER_PAGE;
     const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars`);
     
-    // Add brand filter
-    url.searchParams.append('filter[brand][_eq]', brand);
+    // Add brand_id filter
+    url.searchParams.append('filter[brand_id][_eq]', brandId);
     
     // Add other filters
     if (filters.year) {
@@ -81,12 +83,22 @@ async function getCarsByBrand(
       }
     }
     
-    if (filters.priceRange) {
+    if (filters.priceRange &&
+      Array.isArray(filters.priceRange) &&
+      filters.priceRange.length === 2 &&
+      isFinite(filters.priceRange[0]) && isFinite(filters.priceRange[1]) &&
+      !isNaN(filters.priceRange[0]) && !isNaN(filters.priceRange[1]) &&
+      filters.priceRange[0] !== filters.priceRange[1]) {
       url.searchParams.append('filter[price][_gte]', filters.priceRange[0].toString());
       url.searchParams.append('filter[price][_lte]', filters.priceRange[1].toString());
     }
     
-    if (filters.mileageRange) {
+    if (filters.mileageRange &&
+      Array.isArray(filters.mileageRange) &&
+      filters.mileageRange.length === 2 &&
+      isFinite(filters.mileageRange[0]) && isFinite(filters.mileageRange[1]) &&
+      !isNaN(filters.mileageRange[0]) && !isNaN(filters.mileageRange[1]) &&
+      filters.mileageRange[0] !== filters.mileageRange[1]) {
       url.searchParams.append('filter[mileage][_gte]', filters.mileageRange[0].toString());
       url.searchParams.append('filter[mileage][_lte]', filters.mileageRange[1].toString());
     }
@@ -122,6 +134,7 @@ async function getCarsByBrand(
 
 export default function BrandPageClient({
   initialBrand,
+  initialBrandId,
   initialPage,
   initialSortField,
   initialSortOrder,
@@ -151,6 +164,9 @@ export default function BrandPageClient({
     colors: [],
     engineVolumes: []
   });
+  const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
+  const [brandName] = useState(initialBrand);
+  const [brandId] = useState(initialBrandId);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
@@ -159,7 +175,12 @@ export default function BrandPageClient({
     const loadCars = async () => {
       try {
         setLoading(true);
-        const result = await getCarsByBrand(initialBrand, currentPage, sortConfig.field, sortConfig.order, filters);
+        if (!brandId) {
+          setCars([]);
+          setTotal(0);
+          return;
+        }
+        const result = await getCarsByBrand(brandId, currentPage, sortConfig.field, sortConfig.order, filters);
         setCars(result.cars);
         setTotal(result.total);
       } catch (err) {
@@ -171,7 +192,13 @@ export default function BrandPageClient({
     };
 
     loadCars();
-  }, [initialBrand, currentPage, sortConfig, filters]);
+  }, [brandId, currentPage, sortConfig, filters]);
+
+  useEffect(() => {
+    fetchBrands().then(res => {
+      setBrands(res.data);
+    }).catch(() => setBrands([]));
+  }, []);
 
   const handleSort = (field: SortField) => {
     setSortConfig(prev => ({
@@ -209,7 +236,7 @@ export default function BrandPageClient({
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars?filter[brand][_eq]=${initialBrand}&fields=year,color,engine_volume,price,mileage`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars?filter[brand_id][_eq]=${brandId}&fields=year,color,engine_volume,price,mileage`);
         const data = await response.json();
         
         const years = Array.from(new Set(data.data.map((car: Car) => car.year)))
@@ -231,23 +258,23 @@ export default function BrandPageClient({
           .map((car: Car) => car.mileage)
           .filter((mileage: unknown): mileage is number => typeof mileage === 'number');
         
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-        const minMileage = Math.min(...mileages);
-        const maxMileage = Math.max(...mileages);
+        const minPrice = prices.length ? Math.min(...prices) : undefined;
+        const maxPrice = prices.length ? Math.max(...prices) : undefined;
+        const minMileage = mileages.length ? Math.min(...mileages) : undefined;
+        const maxMileage = mileages.length ? Math.max(...mileages) : undefined;
 
         setFilterOptions({
           years,
-          mileageRanges: [minMileage, maxMileage],
-          priceRanges: [minPrice, maxPrice],
+          mileageRanges: [minMileage ?? 0, maxMileage ?? 0],
+          priceRanges: [minPrice ?? 0, maxPrice ?? 0],
           colors,
           engineVolumes
         });
 
         setFilters(prev => ({
           ...prev,
-          priceRange: [minPrice, maxPrice],
-          mileageRange: [minMileage, maxMileage]
+          priceRange: [minPrice ?? 0, maxPrice ?? 0],
+          mileageRange: [minMileage ?? 0, maxMileage ?? 0]
         }));
       } catch (err) {
         console.error('Error fetching filter options:', err);
@@ -255,7 +282,7 @@ export default function BrandPageClient({
     };
 
     fetchFilterOptions();
-  }, [initialBrand]);
+  }, [brandId]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -263,7 +290,7 @@ export default function BrandPageClient({
       <div className="relative bg-gradient-to-r from-indigo-900 to-purple-900 text-white">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Автомобили {initialBrand}
+            Автомобили {brandName}
           </h1>
         </div>
       </div>
@@ -379,7 +406,7 @@ export default function BrandPageClient({
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {cars.map((car) => (
-                      <CarListItem key={car.infoid} car={car} />
+                      <CarListItem key={car.infoid} car={car} brands={brands} />
                     ))}
                   </div>
 

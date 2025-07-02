@@ -21,6 +21,11 @@ interface GetCarsParams {
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 минут
 
+// --- Кэширование списка серий ---
+let seriesCache: Record<number, string> = {};
+let lastSeriesFetch = 0;
+const SERIES_CACHE_TTL = 5 * 60 * 1000; // 5 минут
+
 class DirectusAPI {
   private baseURL: string;
   private token?: string;
@@ -68,6 +73,17 @@ class DirectusAPI {
       const paramsToSend = { ...params };
       if (paramsToSend.filter) {
         paramsToSend.filter = JSON.stringify(paramsToSend.filter);
+      }
+      // Всегда добавляем expand для бренда и серии
+      if (!paramsToSend.fields) {
+        paramsToSend.fields = '*,brand_id.id,brand_id.name,series_id.id,series_id.seriesname';
+      } else if (typeof paramsToSend.fields === 'string') {
+        if (!paramsToSend.fields.includes('brand_id.name')) {
+          paramsToSend.fields += ',brand_id.id,brand_id.name';
+        }
+        if (!paramsToSend.fields.includes('series_id.seriesname')) {
+          paramsToSend.fields += ',series_id.id,series_id.seriesname';
+        }
       }
       
       const response = await axios.get(`${this.baseURL}/items/Cars`, {
@@ -117,6 +133,25 @@ class DirectusAPI {
     const queryString = searchParams.toString();
     return `${this.baseURL}/assets/${assetId}${queryString ? `?${queryString}` : ''}`;
   }
+
+  async getAllSeries(): Promise<DirectusResponse<import('@/types/directus').Series>> {
+    try {
+      const response = await axios.get(`${this.baseURL}/items/series`, {
+        params: { fields: 'id,seriesname', limit: 1000 }
+      });
+      // Приводим к ожидаемому формату Series (без brand_id)
+      return {
+        data: (response.data.data || []).map((s: any) => ({
+          id: s.id,
+          name: s.seriesname
+        })),
+        meta: response.data.meta || { total_count: 0, filter_count: 0 }
+      };
+    } catch (error) {
+      console.error('Error fetching series:', error);
+      throw error;
+    }
+  }
 }
 
 export const directusAPI = new DirectusAPI(DIRECTUS_URL, DIRECTUS_TOKEN);
@@ -138,4 +173,22 @@ export async function fetchCars(params: unknown): Promise<DirectusResponse<Car>>
 
 export async function fetchBrands(): Promise<DirectusResponse<Brand>> {
   return directusAPI.getBrands();
+}
+
+export async function fetchAllSeries(): Promise<DirectusResponse<import('@/types/directus').Series>> {
+  return directusAPI.getAllSeries();
+}
+
+export async function getSeriesMap(): Promise<Record<number, string>> {
+  if (Date.now() - lastSeriesFetch > SERIES_CACHE_TTL || Object.keys(seriesCache).length === 0) {
+    const res = await fetch('https://api.fluxcars.com/items/series?fields=id,seriesname&limit=5000');
+    const { data } = await res.json();
+    const map: Record<number, string> = {};
+    for (const s of data) {
+      map[s.id] = s.seriesname;
+    }
+    seriesCache = map;
+    lastSeriesFetch = Date.now();
+  }
+  return seriesCache;
 }

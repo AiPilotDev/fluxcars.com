@@ -60,8 +60,8 @@ async function getCarsByModel(
     const offset = (page - 1) * ITEMS_PER_PAGE;
     const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars`);
     
-    // Add model filter
-    url.searchParams.append('filter[model][_eq]', model);
+    // Add model filter (series_id)
+    url.searchParams.append('filter[series_id][_eq]', model);
     
     // Add other filters
     if (filters.year) {
@@ -82,12 +82,22 @@ async function getCarsByModel(
       }
     }
     
-    if (filters.priceRange) {
+    if (filters.priceRange &&
+      Array.isArray(filters.priceRange) &&
+      filters.priceRange.length === 2 &&
+      isFinite(filters.priceRange[0]) && isFinite(filters.priceRange[1]) &&
+      !isNaN(filters.priceRange[0]) && !isNaN(filters.priceRange[1]) &&
+      filters.priceRange[0] !== filters.priceRange[1]) {
       url.searchParams.append('filter[price][_gte]', filters.priceRange[0].toString());
       url.searchParams.append('filter[price][_lte]', filters.priceRange[1].toString());
     }
     
-    if (filters.mileageRange) {
+    if (filters.mileageRange &&
+      Array.isArray(filters.mileageRange) &&
+      filters.mileageRange.length === 2 &&
+      isFinite(filters.mileageRange[0]) && isFinite(filters.mileageRange[1]) &&
+      !isNaN(filters.mileageRange[0]) && !isNaN(filters.mileageRange[1]) &&
+      filters.mileageRange[0] !== filters.mileageRange[1]) {
       url.searchParams.append('filter[mileage][_gte]', filters.mileageRange[0].toString());
       url.searchParams.append('filter[mileage][_lte]', filters.mileageRange[1].toString());
     }
@@ -153,6 +163,7 @@ export default function ModelPageClient({
     engineVolumes: []
   });
   const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
+  const [modelName, setModelName] = useState<string>(initialModel);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
@@ -178,6 +189,19 @@ export default function ModelPageClient({
   useEffect(() => {
     fetchBrands().then(res => setBrands(res.data)).catch(() => setBrands([]));
   }, []);
+
+  useEffect(() => {
+    // Если initialModel — это id (число), получаем название серии
+    if (/^\d+$/.test(initialModel)) {
+      fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/series/${initialModel}?fields=seriesname`)
+        .then(res => res.json())
+        .then(data => {
+          if (data?.data?.seriesname) setModelName(data.data.seriesname);
+        });
+    } else {
+      setModelName(initialModel);
+    }
+  }, [initialModel]);
 
   const handleSort = (field: SortField) => {
     setSortConfig(prev => ({
@@ -215,33 +239,27 @@ export default function ModelPageClient({
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars?filter[model][_eq]=${initialModel}&fields=year,color,engine_volume,price,mileage`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars?filter[series_id][_eq]=${initialModel}&fields=year,color,engine_volume,price,mileage`);
         const data = await response.json();
-        
-        const years = Array.from(new Set(data.data.map((car: Car) => car.year)))
+        const cars = Array.isArray(data?.data) ? data.data : [];
+        const years = Array.from(new Set(cars.map((car: Car) => car.year)))
           .filter((year: unknown): year is number => typeof year === 'number')
           .sort((a, b) => b - a);
-        
-        const colors = Array.from(new Set(data.data.map((car: Car) => car.color)))
+        const colors = Array.from(new Set(cars.map((car: Car) => car.color)))
           .filter((color: unknown): color is string => typeof color === 'string');
-        
-        const engineVolumes = Array.from(new Set(data.data.map((car: Car) => car.engine_volume)))
+        const engineVolumes = Array.from(new Set(cars.map((car: Car) => car.engine_volume)))
           .filter((volume: unknown): volume is number => typeof volume === 'number')
           .sort((a, b) => a - b);
-        
-        const prices = data.data
+        const prices = cars
           .map((car: Car) => car.price)
           .filter((price: unknown): price is number => typeof price === 'number');
-        
-        const mileages = data.data
+        const mileages = cars
           .map((car: Car) => car.mileage)
           .filter((mileage: unknown): mileage is number => typeof mileage === 'number');
-        
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-        const minMileage = Math.min(...mileages);
-        const maxMileage = Math.max(...mileages);
-
+        const minPrice = prices.length ? Math.min(...prices) : 0;
+        const maxPrice = prices.length ? Math.max(...prices) : 0;
+        const minMileage = mileages.length ? Math.min(...mileages) : 0;
+        const maxMileage = mileages.length ? Math.max(...mileages) : 0;
         setFilterOptions({
           years,
           mileageRanges: [minMileage, maxMileage],
@@ -249,7 +267,6 @@ export default function ModelPageClient({
           colors,
           engineVolumes
         });
-
         setFilters(prev => ({
           ...prev,
           priceRange: [minPrice, maxPrice],
@@ -259,9 +276,40 @@ export default function ModelPageClient({
         console.error('Error fetching filter options:', err);
       }
     };
-
     fetchFilterOptions();
   }, [initialModel]);
+
+  useEffect(() => {
+    if (!loading && cars.length > 0) {
+      const needBrand = cars.some(car => typeof car.brand_id === 'number');
+      const needSeries = cars.some(car => typeof car.series_id === 'number');
+      if (needBrand || needSeries) {
+        (async () => {
+          let brandsMap: Record<number, string> = {};
+          let seriesMap: Record<number, string> = {};
+          if (needBrand) {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/brands?fields=id,name&limit=1000`);
+            const data = await res.json();
+            if (Array.isArray(data?.data)) {
+              brandsMap = Object.fromEntries(data.data.map((b: any) => [b.id, b.name]));
+            }
+          }
+          if (needSeries) {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/series?fields=id,seriesname&limit=1000`);
+            const data = await res.json();
+            if (Array.isArray(data?.data)) {
+              seriesMap = Object.fromEntries(data.data.map((s: any) => [s.id, s.seriesname]));
+            }
+          }
+          setCars(prev => prev.map(car => ({
+            ...car,
+            brand_id: typeof car.brand_id === 'number' ? { id: car.brand_id, name: brandsMap[car.brand_id] || '—' } : car.brand_id,
+            series_id: typeof car.series_id === 'number' ? { id: car.series_id, seriesname: seriesMap[car.series_id] || '—' } : car.series_id,
+          })));
+        })();
+      }
+    }
+  }, [loading, cars]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -269,7 +317,7 @@ export default function ModelPageClient({
       <div className="relative bg-gradient-to-r from-indigo-900 to-purple-900 text-white">
         <div className="container mx-auto px-4 py-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Автомобили {initialModel}
+            Автомобили {modelName}
           </h1>
         </div>
       </div>
@@ -383,9 +431,9 @@ export default function ModelPageClient({
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                     {cars.map((car) => (
-                      <CarListItem key={car.infoid} car={car} brands={brands} />
+                      <CarListItem key={car.id} car={car} />
                     ))}
                   </div>
 

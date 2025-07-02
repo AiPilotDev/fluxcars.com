@@ -3,14 +3,17 @@ import Link from 'next/link';
 import { Car as CarType } from '@/types/directus';
 import { formatPrice } from '@/utils/formatPrice';
 import { getImageUrl } from '@/utils/getImageUrl';
+import { formatNumberRu } from '@/utils/formatNumberRu';
 
 interface CarCardProps {
   car: CarType;
   brands: { id: string; name: string }[];
   seriesList: { id: string; name: string }[];
+  priceFormatted: string;
+  mileageFormatted: string;
 }
 
-export default function CarCard({ car, brands, seriesList }: CarCardProps) {
+export default function CarCard({ car, brands, seriesList, priceFormatted, mileageFormatted }: CarCardProps) {
   const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
   const imageUrl = getImageUrl(car.thumbnail, directusUrl);
   const brandName = brands.find(b => b.id === car.brand_id)?.name || '—';
@@ -38,10 +41,10 @@ export default function CarCard({ car, brands, seriesList }: CarCardProps) {
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-base font-semibold text-gray-900">
-            {brandName} {seriesName}
+            {brandName} {seriesName}  
           </h3>
           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-            {car.year}
+            {car.year} 
           </span>
         </div>
         <div className="space-y-2 text-sm text-gray-600">
@@ -49,7 +52,7 @@ export default function CarCard({ car, brands, seriesList }: CarCardProps) {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{car.mileage.toLocaleString()} км</span>
+            <span>{formatNumberRu(car.mileage)} км</span>
           </div>
           <div className="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,7 +61,7 @@ export default function CarCard({ car, brands, seriesList }: CarCardProps) {
             <span>Проверен</span>
           </div>
           <p className="text-base font-semibold text-blue-600">
-            {formatPrice(car.price)}
+            {formatNumberRu(car.price)}
           </p>
         </div>
         <div className="mt-4 pt-4 border-t border-gray-100">

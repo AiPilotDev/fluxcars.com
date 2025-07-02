@@ -29,6 +29,22 @@ async function getBrandFromModel(model: string): Promise<string | null> {
   }
 }
 
+async function getSeriesIdByName(seriesName: string): Promise<string | null> {
+  if (!process.env.NEXT_PUBLIC_DIRECTUS_URL) return null;
+  try {
+    const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/series`);
+    url.searchParams.append('filter[seriesname][_eq]', seriesName);
+    url.searchParams.append('fields', 'id');
+    url.searchParams.append('limit', '1');
+    const response = await fetch(url.toString(), { next: { revalidate: 3600 }, headers: { 'Content-Type': 'application/json' } });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.data?.[0]?.id ? String(data.data[0].id) : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -64,6 +80,10 @@ export default async function ModelPage({
   const { model } = await params;
   const decodedModel = decodeURIComponent(model);
   
+  // Получаем id серии по названию модели
+  const seriesId = await getSeriesIdByName(decodedModel);
+  const modelIdForClient = seriesId || decodedModel;
+
   const { page, sort } = await searchParams;
   const currentPage = Number(page) || 1;
   
@@ -73,7 +93,7 @@ export default async function ModelPage({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ModelPageClient
-        initialModel={decodedModel}
+        initialModel={modelIdForClient}
         initialPage={currentPage}
         initialSortField={sortField}
         initialSortOrder={sortOrder}

@@ -6,9 +6,10 @@ import Link from 'next/link';
 import { Car } from '@/types/directus';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { getImageUrl } from '@/utils/getImageUrl';
+import { formatNumberRu } from '@/utils/formatNumberRu';
 
 interface FeaturedCarsSliderProps {
-  cars: Car[];
+  cars: (Car & { priceFormatted: string; mileageFormatted: string })[];
   brands: { id: string; name: string }[];
   seriesList: { id: string; name: string }[];
 }
@@ -54,11 +55,11 @@ export default function FeaturedCarsSlider({ cars, brands, seriesList }: Feature
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Пробег</p>
-                    <p className="text-lg font-semibold text-white">{car.mileage.toLocaleString()} км</p>
+                    <p className="text-lg font-semibold text-white">{formatNumberRu(car.mileage)} км</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Цена</p>
-                    <p className="text-lg font-semibold text-white">${car.price.toLocaleString()}</p>
+                    <p className="text-lg font-semibold text-white">${formatNumberRu(car.price)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Цвет</p>

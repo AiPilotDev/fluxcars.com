@@ -1,32 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Brand } from '@/types/directus';
-
-async function getAllBrands(): Promise<Brand[]> {
-  if (!process.env.NEXT_PUBLIC_DIRECTUS_URL) {
-    console.error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
-    return [];
-  }
-  try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/brands`);
-    url.searchParams.append('fields', 'id,name');
-    url.searchParams.append('sort', 'name');
-    url.searchParams.append('limit', '100');
-    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
-    if (!response.ok) {
-      console.error('Failed to fetch brands:', response.status, response.statusText);
-      return [];
-    }
-    const data = await response.json();
-    return data.data as Brand[];
-  } catch (error) {
-    console.error('Error fetching brands:', error);
-    return [];
-  }
-}
+import { fetchBrands } from '@/lib/directus';
 
 export default async function BrandsPage() {
-  const brands = await getAllBrands();
+  const brandsRes = await fetchBrands();
+  const brands = brandsRes.data;
   if (brands.length === 0) {
     notFound();
   }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import CarListItem from '@/components/CarListItem';
 import Pagination from '@/components/Pagination';
 import { Car } from '@/types/directus';
@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ArrowUpDown } from 'lucide-react';
 import { formatError } from '@/utils/formatError';
 import { fetchBrands } from '@/lib/directus';
+import { useRouter } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -43,6 +44,7 @@ interface BrandPageClientProps {
   initialPage: number;
   initialSortField: SortField;
   initialSortOrder: SortOrder;
+  initialSeriesList: { id: number; name: string }[];
 }
 
 async function getCarsByBrand(
@@ -138,6 +140,7 @@ export default function BrandPageClient({
   initialPage,
   initialSortField,
   initialSortOrder,
+  initialSeriesList,
 }: BrandPageClientProps) {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
@@ -167,6 +170,7 @@ export default function BrandPageClient({
   const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
   const [brandName] = useState(initialBrand);
   const [brandId] = useState(initialBrandId);
+  const [seriesList] = useState<{ id: number; name: string }[]>(initialSeriesList);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
@@ -197,7 +201,7 @@ export default function BrandPageClient({
   useEffect(() => {
     fetchBrands().then(res => {
       setBrands(res.data);
-    }).catch(() => setBrands([]));
+    });
   }, []);
 
   const handleSort = (field: SortField) => {
@@ -404,10 +408,19 @@ export default function BrandPageClient({
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {cars.map((car) => (
-                      <CarListItem key={car.infoid} car={car} brands={brands} />
-                    ))}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    {cars.length === 0 ? (
+                      <div className="col-span-4 text-gray-500">Нет авто</div>
+                    ) : (
+                      cars.map((car) => {
+                        // Получаем бренд и серию из car, если есть, иначе ищем по спискам
+                        const brandName = car.brand_id?.name || brands.find(b => String(b.id) === String(car.brand_id))?.name || '—';
+                        const seriesName = car.series_id?.seriesname || seriesList.find(s => String(s.id) === String(car.series_id))?.name || '—';
+                        return (
+                          <CarListItem key={car.id} car={{ ...car, brand_id: { id: car.brand_id?.id || car.brand_id, name: brandName }, series_id: { id: car.series_id?.id || car.series_id, seriesname: seriesName } }} />
+                        );
+                      })
+                    )}
                   </div>
 
                   {totalPages > 1 && (
@@ -440,15 +453,19 @@ export default function BrandPageClient({
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
-                        {Array.from(new Set(cars.map(car => car.model))).map(model => (
-                          <Link
-                            key={model}
-                            href={`/cars/model/${encodeURIComponent(model)}`}
-                            className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
-                          >
-                            {model}
-                          </Link>
-                        ))}
+                        {seriesList.length === 0 ? (
+                          <div className="col-span-2 text-gray-400 text-sm">Нет моделей</div>
+                        ) : (
+                          seriesList.map(series => (
+                            <Link
+                              key={series.id}
+                              href={`/cars/model/${encodeURIComponent(series.name)}`}
+                              className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
+                            >
+                              {series.name}
+                            </Link>
+                          ))
+                        )}
                       </div>
                     )}
                   </div>

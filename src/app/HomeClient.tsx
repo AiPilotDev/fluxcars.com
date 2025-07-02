@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { directusAPI, fetchBrands } from '@/lib/directus';
-import { Car } from '@/types/directus';
+import { Car, Brand, Series } from '@/types/directus';
 import { 
   AdjustmentsHorizontalIcon,
   CheckCircleIcon,
@@ -15,59 +14,34 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 import CarListItem from '@/components/CarListItem';
-import { formatError } from '@/utils/formatError';
-import { useRouter } from 'next/navigation';
 
-const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
-if (!directusUrl) {
-  throw new Error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
+interface HomeClientProps {
+  brands: Brand[];
+  seriesList: Series[];
+  newCars: Car[];
 }
 
-function HeroSearchForm() {
-  const router = useRouter();
-  const [brands, setBrands] = useState<Array<{ id: string; name: string }>>([]);
-  const [models, setModels] = useState<Array<{ id: string; name: string }>>([]);
-  const [brand, setBrand] = useState('');
-  const [model, setModel] = useState('');
+function HeroSearchForm({ brands, seriesList }: { brands: Brand[]; seriesList: Series[] }) {
+  const [brand, setBrand] = useState<number | ''>('');
+  const [model, setModel] = useState<number | ''>('');
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    fetch('/api/cars/filter-options')
-      .then(res => res.json())
-      .then((data) => {
-        if (data && Array.isArray(data.brands)) {
-          setBrands(data.brands);
-        } else {
-          setBrands([]);
-        }
-      })
-      .catch(() => setBrands([]));
-  }, []);
-
-  useEffect(() => {
-    if (brand) {
-      fetch(`/api/cars/models?brand_id=${encodeURIComponent(brand)}`)
-        .then(res => res.json())
-        .then((data) => {
-          if (data && Array.isArray(data.series)) {
-            setModels(data.series);
-          } else {
-            setModels([]);
-          }
-        })
-        .catch(() => setModels([]));
-    } else {
-      setModels([]);
-    }
-  }, [brand]);
+  // Фильтруем серии по бренду (как на /cars)
+  const filteredSeries = brand
+    ? seriesList.filter(s => String(s.series_brand_id) === String(brand))
+    : [];
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (search) params.append('search', search);
-    if (brand) params.append('brand', brand);
-    if (model) params.append('model', model);
-    router.push(`/cars?${params.toString()}`);
+    if (brand) params.append('brand', String(brand));
+    if (model) {
+      params.append('model', String(model));
+      params.append('series_id', String(model));
+    }
+    params.append('page', '1');
+    window.location.href = `/cars?${params.toString()}`;
   };
 
   return (
@@ -78,7 +52,7 @@ function HeroSearchForm() {
       </div>
       <div>
         <label className="block text-xs font-semibold text-slate-400 mb-1">Бренд</label>
-        <select value={brand} onChange={e => setBrand(e.target.value)} className="w-full px-3 py-2 rounded-md bg-gray-900 border border-slate-700 text-slate-100 focus:ring-2 focus:ring-cyan-400 outline-none">
+        <select value={brand} onChange={e => { setBrand(e.target.value ? Number(e.target.value) : ''); setModel(''); }} className="w-full px-3 py-2 rounded-md bg-gray-900 border border-slate-700 text-slate-100 focus:ring-2 focus:ring-cyan-400 outline-none">
           <option value="">Все бренды</option>
           {brands.map(b => (
             <option key={b.id} value={b.id}>{b.name}</option>
@@ -87,13 +61,11 @@ function HeroSearchForm() {
       </div>
       <div>
         <label className="block text-xs font-semibold text-slate-400 mb-1">Модель</label>
-        <select value={model} onChange={e => setModel(e.target.value)} className="w-full px-3 py-2 rounded-md bg-gray-900 border border-slate-700 text-slate-100 focus:ring-2 focus:ring-cyan-400 outline-none" disabled={!brand}>
+        <select value={model} onChange={e => setModel(e.target.value ? Number(e.target.value) : '')} className="w-full px-3 py-2 rounded-md bg-gray-900 border border-slate-700 text-slate-100 focus:ring-2 focus:ring-cyan-400 outline-none" disabled={!brand}>
           <option value="">Все модели</option>
-          {models.map(m =>
-            typeof m === 'string'
-              ? <option key={m} value={m}>{m}</option>
-              : <option key={m.id} value={m.id}>{m.name}</option>
-          )}
+          {filteredSeries.map(m => (
+            <option key={m.id} value={m.id}>{m.seriesname}</option>
+          ))}
         </select>
       </div>
       <button type="submit" className="mt-2 w-full bg-gradient-to-r from-cyan-700 to-blue-600 text-white font-bold py-3 rounded-lg shadow-lg hover:from-cyan-500 hover:to-blue-400 transition ring-2 ring-cyan-400 ring-offset-2">Найти авто</button>
@@ -101,71 +73,7 @@ function HeroSearchForm() {
   );
 }
 
-export default function HomeClient() {
-  const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [itemsPerPage] = useState(12);
-  const [newCars, setNewCars] = useState<Car[]>([]);
-  const [brands, setBrands] = useState<Array<{ id: string; name: string }>>([]);
-  const [seriesList, setSeriesList] = useState<Array<{ id: string; name: string }>>([]);
-
-  useEffect(() => {
-    setMounted(true);
-    loadData();
-    loadNewCars();
-    fetchBrands().then(res => setBrands(res.data)).catch(() => setBrands([]));
-    fetchSeries();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const params: Record<string, unknown> = {
-        limit: itemsPerPage,
-        meta: 'total_count,filter_count'
-      };
-      const response = await directusAPI.getCars(params);
-      // eslint-disable-next-line
-      console.log('Всего авто:', response.data.length, 'Новых авто:', response.data.filter(car => car.condition === 'New').length, response.data.map(car => car.condition));
-    } catch (err) {
-      // eslint-disable-next-line
-      console.error('Error fetching cars:', formatError(err));
-      setError(formatError(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadNewCars = async () => {
-    try {
-      const response = await directusAPI.getCars({
-        sort: '-date_created',
-        limit: 8
-      });
-      setNewCars(response.data);
-    } catch (err) {
-      // eslint-disable-next-line
-      console.error('Error fetching new cars:', formatError(err));
-    }
-  };
-
-  const fetchSeries = async () => {
-    try {
-      const res = await fetch(`${directusUrl}/items/series?fields=id,seriesname&limit=1000`);
-      if (!res.ok) throw new Error('Failed to fetch series');
-      const data = await res.json();
-      setSeriesList((data.data || []).map((s: { id: string; seriesname: string }) => ({ id: s.id, name: s.seriesname })));
-    } catch {
-      setSeriesList([]);
-    }
-  };
-
-  if (!mounted) {
-    return null;
-  }
-
+export default function HomeClient({ brands, seriesList, newCars }: HomeClientProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section на всю ширину экрана */}
@@ -182,7 +90,7 @@ export default function HomeClient() {
           {/* Форма поиска */}
           <div className="flex items-center justify-center w-full max-w-lg">
             <div className="w-full">
-              <HeroSearchForm />
+              <HeroSearchForm brands={brands} seriesList={seriesList} />
             </div>
           </div>
         </div>
@@ -310,26 +218,16 @@ export default function HomeClient() {
           </section>
 
           {/* Cars Grid */}
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            </div>
-          ) : error ? (
-            <div className="text-center py-12 text-red-600">{error}</div>
-          ) : (
-            <>
-              <h2 className="text-2xl font-bold mb-6">Новые авто</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                {newCars.length === 0 ? (
-                  <div className="col-span-4 text-gray-500">Нет новых авто</div>
-                ) : (
-                  newCars.slice(0, 8).map((car) => (
-                    <CarListItem key={car.id} car={car} brands={brands} seriesList={seriesList} />
-                  ))
-                )}
-              </div>
-            </>
-          )}
+          <h2 className="text-2xl font-bold mb-6">Новые авто</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {newCars.length === 0 ? (
+              <div className="col-span-4 text-gray-500">Нет новых авто</div>
+            ) : (
+              newCars.slice(0, 8).map((car) => (
+                <CarListItem key={car.id} car={car} />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

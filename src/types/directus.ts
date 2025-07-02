@@ -1,24 +1,27 @@
 // src/types/directus.ts
 
 export interface Car {
-  id: string;
+  id: number;
   infoid: number;
   carname: string;
-  brand: string;
-  brand_id: string;
-  model: string;
+  model: string | null;
   year: number;
   mileage: number;
   price: number;
-  thumbnail: string | null;
-  images?: string[];
-  date_created?: string;
-  date_updated?: string;
-  color?: string;
-  engine_volume?: number;
-  condition?: string;
-  series_id?: string;
-  series?: Series;
+  delivery_price: number;
+  description: string;
+  thumbnail: string;
+  condition: string;
+  transmission: string;
+  fuel_type: string;
+  car_type: string;
+  vin: string;
+  color: string;
+  acceleration: string;
+  engine_volume: number | null;
+  brand_id: { id: number; name: string };
+  series_id: { id: number; seriesname: string };
+  images: number[];
 }
 
 export interface DirectusResponse<T = unknown> {
@@ -39,12 +42,13 @@ export interface DirectusError {
 }
 
 export interface Brand {
-  id: string;
+  id: number;
   name: string;
+  series: number[];
 }
 
 export interface Series {
-  id: string;
-  name: string;
-  brand_id: string;
+  id: number;
+  seriesname: string;
+  series_brand_id: number;
 }

@@ -8,7 +8,11 @@ import DescriptionWrapper from './DescriptionWrapper';
 import ContactsBlock from './ContactsBlock';
 import { formatError } from '@/utils/formatError';
 import { formatPrice } from '@/utils/formatPrice';
-import { fetchBrands } from '@/lib/directus';
+import { formatNumberRu } from '@/utils/formatNumberRu';
+import { fetchBrands, fetchAllSeries, getSeriesMap } from '@/lib/directus';
+import { Brand } from '@/types/directus';
+import { Series } from '@/types/directus';
+import React from 'react';
 
 interface CarPageData {
   id: string;
@@ -38,6 +42,7 @@ interface CarPageData {
     };
   }>;
   brand_id: string;
+  series_id: string;
 }
 
 async function getCar(infoid: number): Promise<CarPageData | null> {
@@ -77,18 +82,15 @@ async function getAllCars(): Promise<DirectusCar[]> {
     console.error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
     return [];
   }
-
   try {
     const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars`);
-    url.searchParams.append('fields', '*,images.*,images.directus_files_id.*');
-    
+    url.searchParams.append('fields', 'id,carname,brand_id,series_id,year,price,images');
+    url.searchParams.append('limit', '100');
     const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
-    
     if (!response.ok) {
       console.error('Failed to fetch cars:', response.status, response.statusText);
       return [];
     }
-
     const data = await response.json();
     return data.data as DirectusCar[];
   } catch (error) {
@@ -106,13 +108,12 @@ function InfoItem({ label, value }: { label: string; value: string | number | nu
   );
 }
 
-function CarData({ car, allCars, brands }: { car: CarPageData; allCars: DirectusCar[]; brands: { id: string; name: string }[] }) {
-  // Format numbers as plain strings to avoid hydration issues
+function CarData({ car, allCars, brands, seriesMap }: { car: CarPageData; allCars: DirectusCar[]; brands: Brand[]; seriesMap: Record<number, string> }) {
+  const brandName = brands.find(b => b.id === Number(car.brand_id))?.name || '—';
+  const seriesName = seriesMap[Number(car.series_id)] || '—';
   const formattedPrice = formatPrice(car.price, 'USD');
   const formattedDeliveryPrice = car.delivery_price > 0 ? formatPrice(car.delivery_price, 'USD') : '';
-  const formattedMileage = car.mileage ? String(car.mileage) : '';
-  const brandObj = brands.find(b => b.id === car.brand_id);
-  const brandName = brandObj?.name || '—';
+  const formattedMileage = car.mileage ? formatNumberRu(car.mileage) : '';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -131,10 +132,10 @@ function CarData({ car, allCars, brands }: { car: CarPageData; allCars: Directus
             </Link>
             <span>•</span>
             <Link 
-              href={`/cars/model/${encodeURIComponent(car.model)}`}
+              href={car.series_id ? `/cars/model/${encodeURIComponent(seriesName)}` : '#'}
               className="hover:text-white transition-colors"
             >
-              {car.model}
+              {seriesName}
             </Link>
             <span>•</span>
             <Link 
@@ -186,7 +187,7 @@ function CarData({ car, allCars, brands }: { car: CarPageData; allCars: Directus
                   <InfoItem label="Пробег" value={formattedMileage ? `${formattedMileage} км` : null} />
                   <InfoItem label="Год выпуска" value={car.year?.toString()} />
                   <InfoItem label="Марка" value={brandName} />
-                  <InfoItem label="Модель" value={car.model} />
+                  <InfoItem label="Серия" value={seriesName} />
                 </div>
               </div>
             </div>
@@ -266,9 +267,6 @@ function CarData({ car, allCars, brands }: { car: CarPageData; allCars: Directus
                 <DescriptionWrapper description={car.description} />
               </div>
             </div>
-
-            {/* Similar Cars */}
-            <SimilarCars currentCar={car} cars={allCars} />
           </div>
 
           {/* Right Column - Price and Contact - Desktop Only */}
@@ -343,16 +341,17 @@ export default async function CarPage({ params }: { params: Promise<{ infoid: st
   if (isNaN(infoidNum)) {
     notFound();
   }
-  const [car, allCars, brandsRes] = await Promise.all([
+  const [car, allCars, brandsRes, seriesMap] = await Promise.all([
     getCar(infoidNum),
     getAllCars(),
-    fetchBrands()
+    fetchBrands(),
+    getSeriesMap()
   ]);
   const brands = brandsRes.data;
   if (!car) {
     notFound();
   }
-  return <CarData car={car} allCars={allCars} brands={brands} />;
+  return <CarData car={car} allCars={allCars} brands={brands} seriesMap={seriesMap} />;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ infoid: string }> }): Promise<Metadata> {
@@ -368,10 +367,10 @@ export async function generateMetadata({ params }: { params: Promise<{ infoid: s
 
   return {
     title: `Купить ${car.carname} в Китае - ${car.year} г. Стоимость ${car.price}|${car.color}`,
-    description: `Покупка и доставка ${car.carname} из Китая. Стоимость $${car.price}. Цвет: ${car.color} Марка: ${car.brand}. Модель: ${car.model} ${car.year} года -${car.fuel_type}`,
+    description: `Покупка и доставка ${car.carname} из Китая. Стоимость $${car.price}. Цвет: ${car.color} Марка: ${car.brand}. Серия: ${car.series_id ? car.series_id : '—'} ${car.year} года -${car.fuel_type}`,
     openGraph: {
       title: `Купить ${car.carname} в Китае - ${car.year} г. Стоимость ${car.price}|${car.color}`,
-      description: `Покупка и доставка ${car.carname} из Китая. Стоимость $${car.price}. Цвет: ${car.color} Марка: ${car.brand}. Модель: ${car.model} ${car.year} года -${car.fuel_type}`,
+      description: `Покупка и доставка ${car.carname} из Китая. Стоимость $${car.price}. Цвет: ${car.color} Марка: ${car.brand}. Серия: ${car.series_id ? car.series_id : '—'} ${car.year} года -${car.fuel_type}`,
       type: 'website',
       locale: 'ru_RU',
     }

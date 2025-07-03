@@ -465,9 +465,9 @@ export default function ModelPageClient({
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
-                        {Array.from(new Set(cars.map(car => car.brand_id)))
+                        {Array.from(new Set(cars.map(car => typeof car.brand_id === 'object' && car.brand_id !== null ? car.brand_id.id : car.brand_id)))
                           .map(brandId => {
-                            const brand = brands.find(b => b.id === brandId);
+                            const brand = brands.find(b => String(b.id) === String(brandId));
                             if (!brand) return null;
                             return (
                               <Link
@@ -490,4 +490,4 @@ export default function ModelPageClient({
       </div>
     </div>
   );
-} 
+}

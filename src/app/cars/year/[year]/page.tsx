@@ -32,7 +32,7 @@ async function getCarsByYear(year: string, page: number = 1) {
     const offset = (page - 1) * ITEMS_PER_PAGE;
     const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars`);
     url.searchParams.append('filter[year][_eq]', year);
-    url.searchParams.append('fields', '*,images.*');
+    url.searchParams.append('fields', '*,images.*,brand_id.id,brand_id.name,series_id.id,series_id.seriesname');
     url.searchParams.append('limit', ITEMS_PER_PAGE.toString());
     url.searchParams.append('offset', offset.toString());
     url.searchParams.append('sort', '-date_created');
@@ -100,7 +100,7 @@ export default async function YearPage({
               <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {cars.map((car) => (
-                    <CarListItem key={car.infoid} car={car} brands={brands} />
+                    <CarListItem key={car.infoid} car={car} />
                   ))}
                 </div>
 
@@ -119,29 +119,33 @@ export default async function YearPage({
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Марки</h3>
                     <div className="grid grid-cols-2 gap-2">
-                      {Array.from(new Set(cars.map(car => car.brand))).map(brand => (
-                        <Link
-                          key={brand}
-                          href={`/cars/brand/${encodeURIComponent(brand)}`}
-                          className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                          {brand}
-                        </Link>
-                      ))}
+                      {Array.from(new Set(cars.map(car => car.brand_id?.name || '—')))
+                        .filter(brand => brand && brand !== '—')
+                        .map(brand => (
+                          <Link
+                            key={brand}
+                            href={`/cars/brand/${encodeURIComponent(brand)}`}
+                            className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
+                          >
+                            {brand}
+                          </Link>
+                        ))}
                     </div>
                   </div>
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-4 border-b pb-2">Модели</h3>
                     <div className="grid grid-cols-2 gap-2">
-                      {Array.from(new Set(cars.map(car => car.model))).map(model => (
-                        <Link
-                          key={model}
-                          href={`/cars/model/${encodeURIComponent(model)}`}
-                          className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                          {model}
-                        </Link>
-                      ))}
+                      {Array.from(new Set(cars.map(car => car.series_id?.seriesname || '—')))
+                        .filter(model => model && model !== '—')
+                        .map(model => (
+                          <Link
+                            key={model}
+                            href={`/cars/model/${encodeURIComponent(model)}`}
+                            className="block text-blue-600 hover:text-blue-800 transition-colors bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium"
+                          >
+                            {model}
+                          </Link>
+                        ))}
                     </div>
                   </div>
                 </div>

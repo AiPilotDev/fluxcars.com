@@ -382,7 +382,7 @@ export default function CarsClient({
               <ul className="absolute z-10 left-0 right-0 bg-white border rounded shadow max-h-60 overflow-auto">
                 {suggestions.map((s, i) => (
                   <li
-                    key={s}
+                    key={i}
                     className={`px-4 py-2 cursor-pointer ${i === highlighted ? 'bg-gray-200' : ''}`}
                     onMouseDown={() => handleSelect(s)}
                     onMouseEnter={() => setHighlighted(i)}

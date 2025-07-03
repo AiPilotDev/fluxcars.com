@@ -26,11 +26,10 @@ export async function GET(req: Request) {
     if (!seriesRes.ok) {
       return NextResponse.json({ error: 'Failed to fetch series', status: seriesRes.status, statusText: seriesRes.statusText }, { status: 500 });
     }
-    const seriesData = await seriesRes.json();
-    const series = (seriesData.data || []).map((s: { id: string; seriesname: string }) => ({ id: s.id, name: s.seriesname }));
-    return NextResponse.json({ series });
+    // const seriesData = await seriesRes.json(); // удалено как неиспользуемое
+    return NextResponse.json({ models: carsData.data.map((car: { model: string }) => car.model) });
   } catch (err: unknown) {
-    const message = typeof err === 'object' && err && 'message' in err ? (err as any).message : String(err);
+    const message = typeof err === 'object' && err && 'message' in err ? String((err as { message: unknown }).message) : String(err);
     return NextResponse.json({ error: 'Server error', message }, { status: 500 });
   }
 } 

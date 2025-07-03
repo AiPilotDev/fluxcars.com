@@ -16,10 +16,15 @@ export async function GET(req: NextRequest) {
   const seriesData = await seriesRes.json();
 
   const suggestions = Array.from(new Set([
-    ...(carsData.data || []).map((c: any) => c.carname),
-    ...(brandsData.data || []).map((b: any) => b.name),
-    ...(seriesData.data || []).map((s: any) => s.seriesname)
+    ...(carsData.data || []).map((c: { id: number; carname: string }) => c.carname),
+    ...(brandsData.data || []).map((b: { name: string }) => b.name),
+    ...(seriesData.data || []).map((s: { seriesname: string }) => s.seriesname)
   ].filter(Boolean)));
 
-  return Response.json(suggestions);
+  const result = suggestions.map((carname: string) => ({
+    id: 0,
+    carname: carname,
+  }));
+
+  return Response.json(result);
 } 

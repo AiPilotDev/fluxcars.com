@@ -35,12 +35,12 @@ interface CarsClientProps {
   priceRangeFormatted: [string, string];
 }
 
-function useDebouncedEffect(effect: () => void, deps: any[], delay: number) {
+function useDebouncedEffect(effect: () => void, deps: unknown[], delay: number) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(effect, delay);
-    return () => timeoutRef.current && clearTimeout(timeoutRef.current);
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
     // eslint-disable-next-line
   }, deps);
 }
@@ -108,7 +108,7 @@ export default function CarsClient({
     setSearch(val);
     setShowDropdown(false);
     setSuggestions([]);
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams || undefined);
     params.set('search', val);
     params.set('page', '1');
     router.replace(`${pathname}?${params.toString()}`);
@@ -451,7 +451,7 @@ export default function CarsClient({
                   const pages = [];
                   const maxVisible = 5;
                   let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-                  let end = Math.min(totalPages, start + maxVisible - 1);
+                  const end = Math.min(totalPages, start + maxVisible - 1);
                   if (end - start + 1 < maxVisible) {
                     start = Math.max(1, end - maxVisible + 1);
                   }

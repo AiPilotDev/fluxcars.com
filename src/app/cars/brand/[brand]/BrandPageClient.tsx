@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import CarListItem from '@/components/CarListItem';
 import Pagination from '@/components/Pagination';
 import { Car } from '@/types/directus';
@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { ArrowUpDown } from 'lucide-react';
 import { formatError } from '@/utils/formatError';
 import { fetchBrands } from '@/lib/directus';
-import { useRouter } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -200,7 +199,7 @@ export default function BrandPageClient({
 
   useEffect(() => {
     fetchBrands().then(res => {
-      setBrands(res.data);
+      setBrands(res.data.map(b => ({ id: String(b.id), name: b.name })));
     });
   }, []);
 
@@ -413,11 +412,19 @@ export default function BrandPageClient({
                       <div className="col-span-4 text-gray-500">Нет авто</div>
                     ) : (
                       cars.map((car) => {
-                        // Получаем бренд и серию из car, если есть, иначе ищем по спискам
-                        const brandName = car.brand_id?.name || brands.find(b => String(b.id) === String(car.brand_id))?.name || '—';
-                        const seriesName = car.series_id?.seriesname || seriesList.find(s => String(s.id) === String(car.series_id))?.name || '—';
+                        // Гарантируем, что brand_id и series_id всегда объект
+                        let brandObj = car.brand_id;
+                        if (typeof car.brand_id === 'number') {
+                          const foundBrand = brands.find(b => String(b.id) === String(car.brand_id));
+                          brandObj = { id: car.brand_id, name: foundBrand?.name || '—' };
+                        }
+                        let seriesObj = car.series_id;
+                        if (typeof car.series_id === 'number') {
+                          const foundSeries = seriesList.find(s => String(s.id) === String(car.series_id));
+                          seriesObj = { id: car.series_id, seriesname: foundSeries?.name || '—' };
+                        }
                         return (
-                          <CarListItem key={car.id} car={{ ...car, brand_id: { id: car.brand_id?.id || car.brand_id, name: brandName }, series_id: { id: car.series_id?.id || car.series_id, seriesname: seriesName } }} />
+                          <CarListItem key={car.id} car={{ ...car, brand_id: brandObj, series_id: seriesObj }} />
                         );
                       })
                     )}

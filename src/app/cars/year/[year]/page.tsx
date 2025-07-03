@@ -5,7 +5,6 @@ import { Car } from '@/types/directus';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { formatError } from '@/utils/formatError';
-import { fetchBrands } from '@/lib/directus';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -70,8 +69,6 @@ export default async function YearPage({
   const { cars, total } = await getCarsByYear(year, currentPage);
   
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-  const brandsRes = await fetchBrands();
-  const brands = brandsRes.data;
 
   return (
     <div className="min-h-screen bg-gray-50">

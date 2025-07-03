@@ -17,7 +17,7 @@ async function fetchSeries() {
 // search: строка поиска (по бренду, серии, названию)
 async function fetchNewCars(search?: string, brand?: string, model?: string) {
   let url = `${API_URL}/Cars?sort=-date_created&limit=8&fields=*,brand_id.id,brand_id.name,series_id.id,series_id.seriesname`;
-  const filter: any = {};
+  const filter: Record<string, unknown> = {};
   if (search && search.trim()) {
     filter._or = [
       { 'brand_id.name': { _icontains: search } },

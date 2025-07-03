@@ -1,11 +1,9 @@
 'use client';
-import { Car as DirectusCar, Brand } from '@/types/directus';
+import { Car as DirectusCar } from '@/types/directus';
 import CarListItem from '@/components/CarListItem';
-import { fetchBrands } from '@/lib/directus';
-import { useEffect, useState } from 'react';
 
 interface CarPageData {
-  id: string;
+  id: number;
   infoid: number;
   carname: string;
   brand: string;
@@ -36,14 +34,15 @@ interface CarPageData {
 interface SimilarCarsProps {
   currentCar: CarPageData;
   cars: DirectusCar[];
-  brands: Brand[];
-  seriesMap: Record<number, string>;
 }
 
-export default function SimilarCars({ currentCar, cars, brands, seriesMap }: SimilarCarsProps) {
-  // Filter out the current car and get similar cars based on brand and model
+export default function SimilarCars({ currentCar, cars }: SimilarCarsProps) {
+  const currentBrandIdStr = String(currentCar.brand);
   const similarCars = cars
-    .filter(car => car.id !== currentCar.id && (car.brand === currentCar.brand || car.model === currentCar.model))
+    .filter(car => {
+      const carBrandIdStr = String(car.brand_id.id);
+      return car.id !== currentCar.id && (carBrandIdStr === currentBrandIdStr || car.model === currentCar.model);
+    })
     .slice(0, 4);
 
   if (similarCars.length === 0) {

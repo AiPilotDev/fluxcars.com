@@ -187,7 +187,7 @@ export default function ModelPageClient({
   }, [initialModel, currentPage, sortConfig, filters]);
 
   useEffect(() => {
-    fetchBrands().then(res => setBrands(res.data)).catch(() => setBrands([]));
+    fetchBrands().then(res => setBrands(res.data.map(b => ({ id: String(b.id), name: b.name })))).catch(() => setBrands([]));
   }, []);
 
   useEffect(() => {
@@ -291,14 +291,14 @@ export default function ModelPageClient({
             const res = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/brands?fields=id,name&limit=1000`);
             const data = await res.json();
             if (Array.isArray(data?.data)) {
-              brandsMap = Object.fromEntries(data.data.map((b: any) => [b.id, b.name]));
+              brandsMap = Object.fromEntries(data.data.map((b: { id: string; name: string }) => [b.id, b.name]));
             }
           }
           if (needSeries) {
             const res = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/series?fields=id,seriesname&limit=1000`);
             const data = await res.json();
             if (Array.isArray(data?.data)) {
-              seriesMap = Object.fromEntries(data.data.map((s: any) => [s.id, s.seriesname]));
+              seriesMap = Object.fromEntries(data.data.map((s: { id: string; seriesname: string }) => [s.id, s.seriesname]));
             }
           }
           setCars(prev => prev.map(car => ({

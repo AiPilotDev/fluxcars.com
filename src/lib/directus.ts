@@ -15,6 +15,7 @@ interface GetCarsParams {
   sort?: string;
   filter?: Record<string, unknown> | string;
   meta?: string;
+  fields?: string;
 }
 
 // Кэш для API запросов
@@ -141,9 +142,9 @@ class DirectusAPI {
       });
       // Приводим к ожидаемому формату Series (без brand_id)
       return {
-        data: (response.data.data || []).map((s: any) => ({
-          id: s.id,
-          name: s.seriesname
+        data: (response.data.data || []).map((s: unknown) => ({
+          id: (s as { id: string; seriesname: string }).id,
+          name: (s as { id: string; seriesname: string }).seriesname
         })),
         meta: response.data.meta || { total_count: 0, filter_count: 0 }
       };

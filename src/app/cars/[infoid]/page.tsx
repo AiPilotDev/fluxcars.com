@@ -1,18 +1,15 @@
 import { notFound } from 'next/navigation';
 import ImageGallery from './ImageGallery';
-import SimilarCars from './SimilarCars';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Car as DirectusCar } from '@/types/directus';
+import { Brand } from '@/types/directus';
+import React from 'react';
 import DescriptionWrapper from './DescriptionWrapper';
 import ContactsBlock from './ContactsBlock';
 import { formatError } from '@/utils/formatError';
 import { formatPrice } from '@/utils/formatPrice';
 import { formatNumberRu } from '@/utils/formatNumberRu';
-import { fetchBrands, fetchAllSeries, getSeriesMap } from '@/lib/directus';
-import { Brand } from '@/types/directus';
-import { Series } from '@/types/directus';
-import React from 'react';
+import { fetchBrands, getSeriesMap } from '@/lib/directus';
 
 interface CarPageData {
   id: string;
@@ -77,28 +74,6 @@ async function getCar(infoid: number): Promise<CarPageData | null> {
   }
 }
 
-async function getAllCars(): Promise<DirectusCar[]> {
-  if (!process.env.NEXT_PUBLIC_DIRECTUS_URL) {
-    console.error('NEXT_PUBLIC_DIRECTUS_URL is not defined');
-    return [];
-  }
-  try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/Cars`);
-    url.searchParams.append('fields', 'id,carname,brand_id,series_id,year,price,images');
-    url.searchParams.append('limit', '100');
-    const response = await fetch(url.toString(), { next: { revalidate: 60 }, headers: { 'Content-Type': 'application/json' } });
-    if (!response.ok) {
-      console.error('Failed to fetch cars:', response.status, response.statusText);
-      return [];
-    }
-    const data = await response.json();
-    return data.data as DirectusCar[];
-  } catch (error) {
-    console.error('Error fetching cars:', formatError(error));
-    return [];
-  }
-}
-
 function InfoItem({ label, value }: { label: string; value: string | number | null | undefined }) {
   return (
     <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
@@ -108,7 +83,7 @@ function InfoItem({ label, value }: { label: string; value: string | number | nu
   );
 }
 
-function CarData({ car, allCars, brands, seriesMap }: { car: CarPageData; allCars: DirectusCar[]; brands: Brand[]; seriesMap: Record<number, string> }) {
+function CarData({ car, brands, seriesMap }: { car: CarPageData; brands: Brand[]; seriesMap: Record<number, string> }) {
   const brandName = brands.find(b => b.id === Number(car.brand_id))?.name || '—';
   const seriesName = seriesMap[Number(car.series_id)] || '—';
   const formattedPrice = formatPrice(car.price, 'USD');
@@ -341,9 +316,8 @@ export default async function CarPage({ params }: { params: Promise<{ infoid: st
   if (isNaN(infoidNum)) {
     notFound();
   }
-  const [car, allCars, brandsRes, seriesMap] = await Promise.all([
+  const [car, brandsRes, seriesMap] = await Promise.all([
     getCar(infoidNum),
-    getAllCars(),
     fetchBrands(),
     getSeriesMap()
   ]);
@@ -351,7 +325,7 @@ export default async function CarPage({ params }: { params: Promise<{ infoid: st
   if (!car) {
     notFound();
   }
-  return <CarData car={car} allCars={allCars} brands={brands} seriesMap={seriesMap} />;
+  return <CarData car={car} brands={brands} seriesMap={seriesMap} />;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ infoid: string }> }): Promise<Metadata> {

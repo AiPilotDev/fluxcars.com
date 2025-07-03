@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Car as CarType } from '@/types/directus';
-import { formatPrice } from '@/utils/formatPrice';
 import { getImageUrl } from '@/utils/getImageUrl';
 import { formatNumberRu } from '@/utils/formatNumberRu';
 
@@ -9,15 +8,13 @@ interface CarCardProps {
   car: CarType;
   brands: { id: string; name: string }[];
   seriesList: { id: string; name: string }[];
-  priceFormatted: string;
-  mileageFormatted: string;
 }
 
-export default function CarCard({ car, brands, seriesList, priceFormatted, mileageFormatted }: CarCardProps) {
+export default function CarCard({ car, brands, seriesList }: CarCardProps) {
   const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
   const imageUrl = getImageUrl(car.thumbnail, directusUrl);
-  const brandName = brands.find(b => b.id === car.brand_id)?.name || '—';
-  const seriesName = seriesList.find(s => s.id === car.series_id)?.name || '—';
+  const brandName = brands.find(b => b.id === String(car.brand_id.id))?.name || '—';
+  const seriesName = seriesList.find(s => s.id === String(car.series_id.id))?.name || '—';
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">

@@ -26,7 +26,7 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
   const sortOrder = typeof searchParams.sortOrder === 'string' ? searchParams.sortOrder : 'desc';
 
   // 2. Формируем фильтр для API
-  const filter: any = {};
+  const filter: Record<string, unknown> = {};
   if (brand) filter.brand_id = { _eq: brand };
   if (series_id) filter.series_id = { _eq: series_id };
   if (color) filter.color = { _eq: color };
@@ -87,15 +87,15 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
   const brands = (await brandsRes.json()).data || [];
   const series = (await seriesRes.json()).data || [];
   const carsForFilters = (await yearsRes.json()).data || [];
-  const years = Array.from(new Set(carsForFilters.map((c: any) => c.year)))
-    .filter((v: any): v is number => typeof v === 'number' && !isNaN(v))
-    .sort((a: number, b: number) => b - a);
-  const colors = Array.from(new Set(carsForFilters.map((c: any) => c.color)))
-    .filter((v: any): v is string => typeof v === 'string' && v.length > 0)
+  const years = Array.from(new Set((carsForFilters.map((c: CarListItemType) => c.year) as number[])))
+    .filter((v): v is number => typeof v === 'number' && !isNaN(v))
+    .sort((a, b) => b - a);
+  const colors = Array.from(new Set((carsForFilters.map((c: CarListItemType) => c.color) as string[])))
+    .filter((v): v is string => typeof v === 'string' && v.length > 0)
     .sort();
-  const engineVolumes = Array.from(new Set(carsForFilters.map((c: any) => c.engine_volume)))
-    .filter((v: any): v is number => typeof v === 'number' && !isNaN(v))
-    .sort((a: number, b: number) => a - b);
+  const engineVolumes = Array.from(new Set((carsForFilters.map((c: CarListItemType) => c.engine_volume) as number[])))
+    .filter((v): v is number => typeof v === 'number' && !isNaN(v))
+    .sort((a, b) => a - b);
 
   // Для диапазонов определяем минимальные и максимальные значения
   const minMileage = 0;
@@ -141,4 +141,13 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
       />
     </Suspense>
   );
+}
+
+// Тип для автомобиля
+interface CarListItemType {
+  id: number;
+  carname: string;
+  brand_id: { id: number; name: string };
+  series_id: { id: number; seriesname: string };
+  [key: string]: unknown;
 }

@@ -46,7 +46,7 @@ export default function FeaturedCarsSlider({ cars, brands, seriesList }: Feature
             <div className="relative h-full flex">
               {/* Left Card - 1/3 width */}
               <div className="w-1/3 bg-black p-8 flex flex-col justify-center">
-                <h2 className="text-3xl font-bold mb-2 text-white">{brands.find(b => b.id === car.brand_id)?.name || '—'} {seriesList.find(s => s.id === car.series_id)?.name || '—'}</h2>
+                <h2 className="text-3xl font-bold mb-2 text-white">{brands.find(b => b.id === String(car.brand_id.id))?.name || '—'} {seriesList.find(s => s.id === String(car.series_id.id))?.name || '—'}</h2>
                 <p className="text-xl mb-6 text-gray-300">Авто из нашей подборки</p>
                 <div className="grid grid-cols-1 gap-6 mb-8">
                   <div>
@@ -78,7 +78,7 @@ export default function FeaturedCarsSlider({ cars, brands, seriesList }: Feature
               <div className="w-2/3 relative">
                 <Image
                   src={getImage(car.thumbnail)}
-                  alt={`${brands.find(b => b.id === car.brand_id)?.name || '—'} ${seriesList.find(s => s.id === car.series_id)?.name || '—'}`}
+                  alt={`${brands.find(b => b.id === String(car.brand_id.id))?.name || '—'} ${seriesList.find(s => s.id === String(car.series_id.id))?.name || '—'}`}
                   fill
                   className="object-cover"
                   sizes="66vw"

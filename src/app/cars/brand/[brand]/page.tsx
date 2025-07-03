@@ -26,7 +26,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brand: s
       `${process.env.NEXT_PUBLIC_DIRECTUS_URL}/items/series?filter[series_brand_id][_eq]=${brandId}&fields=id,seriesname&limit=5000`
     );
     const data = await res.json();
-    seriesList = (data.data || []).map((s: any) => ({ id: s.id, name: s.seriesname }));
+    seriesList = (data.data || []).map((s: Record<string, unknown>) => ({ id: s.id, name: s.seriesname }));
   }
 
   return (

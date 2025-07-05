@@ -75,21 +75,28 @@ export default function CarsClient({
   const [highlighted, setHighlighted] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Синхронизация state с props (при переходах)
-  useEffect(() => { setSearch(filters.search || ''); }, [filters.search]);
-  useEffect(() => { setPriceFrom(filters.priceFrom || ''); }, [filters.priceFrom]);
-  useEffect(() => { setPriceTo(filters.priceTo || ''); }, [filters.priceTo]);
-  useEffect(() => { setMileageFrom(filters.mileageFrom || ''); }, [filters.mileageFrom]);
-  useEffect(() => { setMileageTo(filters.mileageTo || ''); }, [filters.mileageTo]);
+  // Debounced update of search param in URL
+  const updateSearchParam = useDebouncedCallback((val: string) => {
+    const params = new URLSearchParams(searchParams || undefined);
+    if (val) {
+      params.set('search', val);
+      params.set('page', '1');
+    } else {
+      params.delete('search');
+      params.set('page', '1');
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  }, 300);
 
-  // Debounced fetch for autocomplete
+  // Debounced fetch for autocomplete suggestions
   const fetchSuggestions = useDebouncedCallback(async (q: string) => {
     if (q.length < 2) {
       setSuggestions([]);
       return;
     }
     const res = await fetch(`/api/cars/autocomplete?query=${encodeURIComponent(q)}`);
-    setSuggestions(await res.json());
+    const data = await res.json();
+    setSuggestions(Array.isArray(data) ? data.map(item => item.carname || item.name || '') : []);
     setShowDropdown(true);
   }, 250);
 
@@ -98,8 +105,10 @@ export default function CarsClient({
   }, [search, fetchSuggestions]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    fetchSuggestions(e.target.value);
+    const val = e.target.value;
+    setSearch(val);
+    updateSearchParam(val);
+    fetchSuggestions(val);
     setShowDropdown(true);
     setHighlighted(-1);
   };
@@ -108,10 +117,7 @@ export default function CarsClient({
     setSearch(val);
     setShowDropdown(false);
     setSuggestions([]);
-    const params = new URLSearchParams(searchParams || undefined);
-    params.set('search', val);
-    params.set('page', '1');
-    router.replace(`${pathname}?${params.toString()}`);
+    updateSearchParam(val);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -196,8 +202,22 @@ export default function CarsClient({
   }
 
   // UI
+  const validCars = Array.isArray(cars)
+    ? cars.filter(car =>
+        car &&
+        typeof car.id === 'number' &&
+        typeof car.carname === 'string' &&
+        car.brand_id && car.brand_id.name &&
+        car.series_id && car.series_id.seriesname &&
+        typeof car.price === 'number' &&
+        typeof car.year === 'number' &&
+        typeof car.mileage === 'number' &&
+        car.thumbnail
+      )
+    : [];
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8 overflow-x-hidden w-full">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Каталог автомобилей</h1>
@@ -211,7 +231,7 @@ export default function CarsClient({
         </div>
         {/* Фильтры */}
         <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Бренд</label>
               <select
@@ -279,7 +299,7 @@ export default function CarsClient({
               </select>
             </div>
             {/* Пробег диапазон */}
-            <div className="col-span-2">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Пробег, км</label>
               <div className="flex items-center justify-between text-xs mb-1">
                 <span>{mileageRangeFormatted[0]} км</span>
@@ -317,7 +337,7 @@ export default function CarsClient({
               </div>
             </div>
             {/* Цена диапазон */}
-            <div className="col-span-2">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Цена, $</label>
               <div className="flex items-center justify-between text-xs mb-1">
                 <span>${priceRangeFormatted[0]}</span>
@@ -354,7 +374,7 @@ export default function CarsClient({
                 />
               </div>
             </div>
-            <div className="col-span-full flex items-end justify-end">
+            <div className="flex items-end justify-end mt-2">
               <button
                 onClick={handleResetFilters}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
@@ -418,7 +438,7 @@ export default function CarsClient({
           </div>
         </div>
         {/* Список авто */}
-        {cars.length === 0 ? (
+        {validCars.length === 0 ? (
           <div className="text-center py-12">
             <div className="bg-white rounded-lg shadow-sm p-8">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Нет автомобилей</h3>
@@ -434,9 +454,14 @@ export default function CarsClient({
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-              {cars.map(car => (
-                <CarListItem key={car.id} car={car} />
-              ))}
+              {validCars.map(car => {
+                try {
+                  return <CarListItem key={car.id} car={car} />;
+                } catch (e) {
+                  console.error('Invalid car object:', car, e);
+                  return null;
+                }
+              })}
             </div>
             {/* Пагинация */}
             {totalPages > 1 && (

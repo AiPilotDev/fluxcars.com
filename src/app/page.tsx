@@ -35,13 +35,40 @@ async function fetchNewCars(search?: string, brand?: string, model?: string) {
   return data;
 }
 
+async function fetchAllCarsBrands() {
+  const res = await fetch(`${API_URL}/Cars?fields=brand_id.id,brand_id.name&limit=10000`, { cache: 'no-store' });
+  const data = await res.json();
+  return data;
+}
+
+export const metadata = {
+  title: "Купить авто из Китая — 100 000+ проверенных предложений | Безопасная сделка",
+  description: "Платформа для поиска и доставки автомобилей из Китая. Гарантия безопасности сделки, проверка истории",
+};
+
 export default async function HomePage(props: { searchParams?: Promise<{ search?: string, brand?: string, model?: string }> }) {
   const searchParams = props.searchParams ? await props.searchParams : {};
-  const [brands, series, newCars] = await Promise.all([
+  const [brands, series, newCars, allCarsBrands] = await Promise.all([
     fetchBrands(),
     fetchSeries(),
-    fetchNewCars(searchParams?.search, searchParams?.brand, searchParams?.model)
+    fetchNewCars(searchParams?.search, searchParams?.brand, searchParams?.model),
+    fetchAllCarsBrands()
   ]);
 
-  return <HomeClient brands={brands.data || []} seriesList={series.data || []} newCars={newCars.data || []} />;
+  // Вычисляем топ-10 популярных брендов по всем авто
+  const brandCounts: Record<string, { id: number; name: string; count: number }> = {};
+  for (const car of allCarsBrands.data || []) {
+    if (car.brand_id && car.brand_id.id && car.brand_id.name) {
+      const id = car.brand_id.id;
+      if (!brandCounts[id]) {
+        brandCounts[id] = { id, name: car.brand_id.name, count: 0 };
+      }
+      brandCounts[id].count++;
+    }
+  }
+  const popularBrands = Object.values(brandCounts)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  return <HomeClient brands={brands.data || []} seriesList={series.data || []} newCars={newCars.data || []} popularBrands={popularBrands} />;
 }

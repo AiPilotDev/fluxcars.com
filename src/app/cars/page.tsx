@@ -14,6 +14,7 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
   const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
   const limit = 16;
+  const apiLimit = 40; // Берём с запасом
   const brand = typeof searchParams.brand === 'string' ? searchParams.brand : '';
   const series_id = typeof searchParams.series_id === 'string' ? searchParams.series_id : '';
   const year = typeof searchParams.year === 'string' ? searchParams.year : '';
@@ -66,7 +67,7 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
 
   // 3. Получаем список авто
   const params = new URLSearchParams();
-  params.set('limit', String(limit));
+  params.set('limit', String(apiLimit)); // увеличенный лимит
   params.set('page', String(page));
   params.set('sort', `${sortOrder === 'desc' ? '-' : ''}${sortField}`);
   params.set('meta', 'total_count,filter_count');
@@ -77,6 +78,40 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
   const carsData = await carsRes.json();
   const cars = carsData.data || [];
   const totalCount = carsData.meta?.total_count || 0;
+  const filterCount = carsData.meta?.filter_count || totalCount;
+
+  // Фильтрация только валидных автомобилей
+  const validCars = Array.isArray(cars)
+    ? cars.filter(car =>
+        car &&
+        typeof car.id === 'number' &&
+        typeof car.carname === 'string' &&
+        car.brand_id && car.brand_id.name &&
+        car.series_id && car.series_id.seriesname &&
+        typeof car.price === 'number' &&
+        typeof car.year === 'number' &&
+        typeof car.mileage === 'number' &&
+        car.thumbnail
+      ).slice(0, limit) // Берём только первые 16 валидных
+    : [];
+
+  // Восстанавливаем подсчет brandCounts и popularBrands
+  const brandCounts: Record<string, { id: number; name: string; count: number }> = {};
+  for (const car of validCars) {
+    if (car.brand_id && car.brand_id.id && car.brand_id.name) {
+      const id = car.brand_id.id;
+      if (!brandCounts[id]) {
+        brandCounts[id] = { id, name: car.brand_id.name, count: 0 };
+      }
+      brandCounts[id].count++;
+    }
+  }
+  const popularBrands = Object.values(brandCounts)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  // Удаляем подсчет brandCounts и popularBrands, оставляем только уникальные бренды из validCars
+  const uniqueBrands = Array.from(new Set(validCars.map(car => car.brand_id && car.brand_id.id ? JSON.stringify(car.brand_id) : null).filter(Boolean))).map(str => str && JSON.parse(str));
 
   // 4. Получаем опции фильтров (бренды, серии, года, цвета, объемы)
   const [brandsRes, seriesRes, yearsRes] = await Promise.all([
@@ -124,22 +159,26 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
   // 5. Передаем все в клиентский компонент
   // TODO: Прописать строгие типы пропсов CarsClient
   return (
-    <Suspense fallback={<div className="text-center py-12">Загрузка...</div>}>
-      <CarsClient
-        cars={cars}
-        totalCount={totalCount}
-        currentPage={page}
-        limit={limit}
-        brands={brands}
-        series={series}
-        years={years}
-        colors={colors}
-        engineVolumes={engineVolumes}
-        filters={{ brand, series_id, year, mileage, price, search, color, engineVolume, sortField, sortOrder }}
-        mileageRangeFormatted={mileageRangeFormatted}
-        priceRangeFormatted={priceRangeFormatted}
-      />
-    </Suspense>
+    <>
+      {/* Каталог авто */}
+      <Suspense fallback={<div className="text-center py-12">Загрузка...</div>}>
+        <CarsClient
+          cars={validCars}
+          totalCount={filterCount}
+          currentPage={page}
+          limit={limit}
+          brands={brands}
+          series={series}
+          years={years}
+          colors={colors}
+          engineVolumes={engineVolumes}
+          filters={{ brand, series_id, year, mileage, price, search, color, engineVolume, sortField, sortOrder }}
+          mileageRangeFormatted={mileageRangeFormatted}
+          priceRangeFormatted={priceRangeFormatted}
+          popularBrands={popularBrands}
+        />
+      </Suspense>
+    </>
   );
 }
 

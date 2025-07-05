@@ -15,10 +15,16 @@ import {
 } from '@heroicons/react/24/outline';
 import CarListItem from '@/components/CarListItem';
 
+interface PopularBrand {
+  id: number;
+  name: string;
+  count: number;
+}
 interface HomeClientProps {
   brands: Brand[];
   seriesList: Series[];
   newCars: Car[];
+  popularBrands: PopularBrand[];
 }
 
 function HeroSearchForm({ brands, seriesList }: { brands: Brand[]; seriesList: Series[] }) {
@@ -73,7 +79,7 @@ function HeroSearchForm({ brands, seriesList }: { brands: Brand[]; seriesList: S
   );
 }
 
-export default function HomeClient({ brands, seriesList, newCars }: HomeClientProps) {
+export default function HomeClient({ brands, seriesList, newCars, popularBrands }: HomeClientProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section на всю ширину экрана */}
@@ -82,10 +88,10 @@ export default function HomeClient({ brands, seriesList, newCars }: HomeClientPr
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-slate-800/80 pointer-events-none" />
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center w-full px-4 py-8 gap-6 text-center lg:text-left">
           {/* Блок с заголовком и описанием */}
-          <div className="flex flex-col items-center lg:items-start justify-center w-full max-w-lg bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-lg p-5 md:p-8 backdrop-blur-md">
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-3 md:mb-4 text-gray-900 dark:text-slate-100 leading-tight" style={{letterSpacing: '0.04em'}}>Авто из Китая</h1>
-            <p className="text-lg md:text-2xl font-semibold text-cyan-700 dark:text-cyan-300 mb-3 md:mb-4">Платформа для поиска автомобилей от продавцов из Китая</p>
-            <p className="text-base md:text-lg mb-0 md:mb-4 text-gray-700 dark:text-slate-300">100% безопасность сделки. Финансовые гарантии нашей платформы и платёжной системы <span className='font-bold text-lime-600 dark:text-lime-400'>Alibaba</span> защищают ваши платежи</p>
+          <div className="flex flex-col items-center lg:items-start justify-center w-full max-w-lg p-0 md:p-0">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-3 md:mb-4 text-white leading-tight" style={{letterSpacing: '0.04em'}}>Авто из Китая</h1>
+            <p className="text-lg md:text-2xl font-semibold text-cyan-700 mb-3 md:mb-4">Платформа для поиска автомобилей от продавцов из Китая</p>
+            <p className="text-base md:text-lg mb-0 md:mb-4 text-white">100% безопасность сделки. Финансовые гарантии нашей платформы и платёжной системы <span className='font-bold text-lime-600'>Alibaba</span> защищают ваши платежи</p>
           </div>
           {/* Форма поиска */}
           <div className="flex items-center justify-center w-full max-w-lg">
@@ -194,28 +200,31 @@ export default function HomeClient({ brands, seriesList, newCars }: HomeClientPr
           </section>
 
           {/* Top Brands Section */}
-          <section className="bg-white rounded-2xl shadow-lg p-4 mb-8 w-full">
-            <div className="flex justify-between items-center mb-4 w-full">
-              <h2 className="text-2xl font-bold">Популярные марки</h2>
-              <Link 
-                href="/cars/brand"
-                className="text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium"
-              >
-                Все марки →
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
-              {brands.slice(0, 10).map((brand) => (
-                <Link
-                  key={brand.id}
-                  href={`/cars/brand/${encodeURIComponent(brand.name)}`}
-                  className="bg-gray-50 rounded-xl p-3 shadow-sm hover:bg-blue-50 transition-colors flex flex-col items-start border border-gray-100 group w-full"
+          {popularBrands.length > 0 && (
+            <section className="bg-white rounded-2xl shadow-lg p-4 mb-8 w-full container mx-auto mt-10">
+              <div className="flex justify-between items-center mb-4 w-full">
+                <h2 className="text-2xl font-bold">Популярные марки</h2>
+                <Link 
+                  href="/cars/brand"
+                  className="text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium"
                 >
-                  <h3 className="font-semibold text-base mb-0.5 text-gray-900 group-hover:text-blue-700 transition-colors">{brand.name}</h3>
+                  Все марки →
                 </Link>
-              ))}
-            </div>
-          </section>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
+                {popularBrands.map((brand) => (
+                  <Link
+                    key={brand.id}
+                    href={`/cars/brand/${encodeURIComponent(brand.name)}`}
+                    className="bg-gray-50 rounded-xl p-3 shadow-sm hover:bg-blue-50 transition-colors flex flex-col items-start border border-gray-100 group w-full"
+                  >
+                    <h3 className="font-semibold text-base mb-0.5 text-gray-900 group-hover:text-blue-700 transition-colors">{brand.name}</h3>
+                    <span className="text-xs text-gray-500">{brand.count} авто</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Cars Grid */}
           <h2 className="text-2xl font-bold mb-6">Новые авто</h2>

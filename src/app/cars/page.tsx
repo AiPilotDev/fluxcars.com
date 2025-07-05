@@ -111,7 +111,6 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
     .slice(0, 8);
 
   // Удаляем подсчет brandCounts и popularBrands, оставляем только уникальные бренды из validCars
-  const uniqueBrands = Array.from(new Set(validCars.map(car => car.brand_id && car.brand_id.id ? JSON.stringify(car.brand_id) : null).filter(Boolean))).map(str => str && JSON.parse(str));
 
   // 4. Получаем опции фильтров (бренды, серии, года, цвета, объемы)
   const [brandsRes, seriesRes, yearsRes] = await Promise.all([

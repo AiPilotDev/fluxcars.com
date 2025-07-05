@@ -33,6 +33,7 @@ interface CarsClientProps {
   };
   mileageRangeFormatted: [string, string];
   priceRangeFormatted: [string, string];
+  popularBrands: { id: number; name: string; count: number }[];
 }
 
 function useDebouncedEffect(effect: () => void, deps: unknown[], delay: number) {

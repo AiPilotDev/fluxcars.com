@@ -81,19 +81,21 @@ export default async function CarsPage(props: { searchParams: Promise<Record<str
   const filterCount = carsData.meta?.filter_count || totalCount;
 
   // Фильтрация только валидных автомобилей
-  const validCars = Array.isArray(cars)
-    ? cars.filter(car =>
-        car &&
-        typeof car.id === 'number' &&
-        typeof car.carname === 'string' &&
-        car.brand_id && car.brand_id.name &&
-        car.series_id && car.series_id.seriesname &&
-        typeof car.price === 'number' &&
-        typeof car.year === 'number' &&
-        typeof car.mileage === 'number' &&
-        car.thumbnail
-      ).slice(0, limit) // Берём только первые 16 валидных
-    : [];
+  // const validCars = Array.isArray(cars)
+  //   ? cars.filter(car =>
+  //       car &&
+  //       typeof car.id === 'number' &&
+  //       typeof car.carname === 'string' &&
+  //       car.brand_id && car.brand_id.name &&
+  //       car.series_id && car.series_id.seriesname &&
+  //       typeof car.price === 'number' &&
+  //       typeof car.year === 'number' &&
+  //       typeof car.mileage === 'number' &&
+  //       car.thumbnail
+  //     ).slice(0, limit) // Берём только первые 16 валидных
+  //   : [];
+  // Теперь берём все автомобили, даже с ошибками
+  const validCars = Array.isArray(cars) ? cars.slice(0, limit) : [];
 
   // Восстанавливаем подсчет brandCounts и popularBrands
   const brandCounts: Record<string, { id: number; name: string; count: number }> = {};
